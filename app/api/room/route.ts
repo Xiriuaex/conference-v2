@@ -41,10 +41,11 @@ export async function GET(res: Response) {
     try {
         const profile = await currentProfile();
 
+        const room = await db.room.findFirst
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
         }
-        
+        if
         const getRoom = await db.room.findMany({
           where: {
             members: {
