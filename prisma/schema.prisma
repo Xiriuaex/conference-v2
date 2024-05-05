@@ -1,0 +1,60 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//profile has 1:1 relation with Member
+model Profile {
+  id       String @id @default(uuid())
+  userId   String @unique
+  name     String @unique
+  imageUrl String @db.Text
+  email    String @db.Text
+
+  member Member?
+
+  @@index([id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//Room has m:1 relation with Member
+model Room {
+  id         String @id @default(uuid())
+  name       String @unique
+  imageUrl   String @db.Text
+  inviteCode String @db.Text
+
+  members Member[] 
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MemberRole {
+  ADMIN
+  MEMBER
+}
+
+//Member has 1:m relation with Room
+//Member has 1:1 relation with Profile
+model Member {
+  id   String     @id @default(uuid())
+  role MemberRole @default(MEMBER)
+
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String  @unique
+
+  rooms Room[] 
+
+  @@index([profileId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
