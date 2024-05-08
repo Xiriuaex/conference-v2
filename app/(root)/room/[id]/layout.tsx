@@ -13,6 +13,8 @@ export const metadata: Metadata = {
 const HomeLayout = ({ children }:
     {children: React.ReactNode}
 ) => {
+
+  
   return (
    
     <StreamVideoProvider>

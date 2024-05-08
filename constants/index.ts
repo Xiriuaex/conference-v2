@@ -1,28 +1,28 @@
 export const sidebarLinks = [
     {
         label: 'Home',
-        imgUrl: './/icons/Home.svg',
-        route: '/room/[roomId]/',
+        imgUrl: '../icons/Home.svg',
+        route: '/',
     },
     {
         label: 'Upcoming',
-        imgUrl: './/icons/upcoming.svg',
-        route: '/room/[roomId]/upcoming',
+        imgUrl: '../icons/upcoming.svg',
+        route: '/upcoming',
     },
     {
         label: 'Previous',
-        imgUrl: './/icons/previous.svg',
-        route: '/room/[roomId]/previous',
+        imgUrl: '../icons/previous.svg',
+        route: '/previous',
     },
     {
         label: 'Recordings',
-        imgUrl: './/icons/recordings.svg',
-        route: '/room/[roomId]/recordings',
+        imgUrl: '../icons/recordings.svg',
+        route: '/recordings',
     },
     {
         label: 'Personal Meet',
-        imgUrl: './/icons/add-personal.svg',
-        route: '/room/[roomId]/personal-meet',
+        imgUrl: '../icons/add-personal.svg',
+        route: '/personal-meet',
     }
 ];
 

@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
  
 import { v4 as uuidv4 } from "uuid";
 
+
+//Create a Room:
 export async function POST(req: Request) {
     try {
         const { name, imageUrl } = await req.json();
@@ -14,16 +16,29 @@ export async function POST(req: Request) {
             return new NextResponse("Unauthorized", { status:400 });
         }
  
-        
+        const member = await db.member.findUnique({
+            where: {
+                profileId: profile?.id
+            }
+        })
+
+        if(!member) {
+            await db.member.create({
+                data: {
+                    profileId: profile.id
+                }
+            })
+         }
         const room = await db.room.create({
             data: {
                 name,
                 imageUrl,
                 inviteCode: uuidv4(), 
                 members: {
-                    create: 
-                        { profileId: profile.id, role: MemberRole.ADMIN}
-                    
+                    connect: { 
+                            profileId: profile.id,
+                            role: "ADMIN"
+                    }
                 }
             }
         })
@@ -37,16 +52,16 @@ export async function POST(req: Request) {
     }
 }
 
+//Get all The Rooms:
 export async function GET(res: Response) {
     try {
         const profile = await currentProfile();
-
-        const room = await db.room.findFirst
+ 
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
-        }
-        if
-        const getRoom = await db.room.findMany({
+        } 
+
+        const room = await db.room.findMany({
           where: {
             members: {
               some: {
@@ -54,18 +69,22 @@ export async function GET(res: Response) {
               }
             }
           },
-          select: {
+          select: { 
             id: true,
-            name: true,
-            members: {
-              select: {
-                role: true,
-              }
-            }
-          } 
+            name: true, 
+            inviteCode: true,
+            members: {  
+                select: {
+                    role: true
+                },
+                where: {
+                    profileId: profile?.id,
+                  },
+            },
+          }, 
         });
 
-        return NextResponse.json(getRoom);
+        return NextResponse.json(room);
 
     } catch (error) {
         console.log("[SERVERS_COULDN'T_GET]", error);

@@ -1,11 +1,8 @@
-import MeetingTypeList from "@/components/meeting-type-list";
-import { CreateProfile } from "@/lib/create-profile";
-import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db";
-import { redirectToSignIn } from "@clerk/nextjs";
-import { useParams, useSearchParams } from "next/navigation";
+'use client'
 
-const personalHomePage = async() => {  
+import MeetingTypeList from "@/components/meeting-type-list";
+
+const personalHomePage = () => {  
   const now = new Date();
 
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
