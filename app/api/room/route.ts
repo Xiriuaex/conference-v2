@@ -1,9 +1,19 @@
+
+
 import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db";
-import { MemberRole } from "@prisma/client";
+import { db } from "@/lib/db"; 
 import { NextResponse } from "next/server";
  
 import { v4 as uuidv4 } from "uuid";
+
+interface typeRoom {
+    id?: string;
+    name?: string;
+    imageUrl?: string;
+    inviteCode?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
 
 
 //Create a Room:
@@ -15,29 +25,21 @@ export async function POST(req: Request) {
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
         }
- 
-        const member = await db.member.findUnique({
-            where: {
-                profileId: profile?.id
-            }
-        })
 
-        if(!member) {
-            await db.member.create({
-                data: {
-                    profileId: profile.id
-                }
-            })
-         }
         const room = await db.room.create({
             data: {
                 name,
                 imageUrl,
                 inviteCode: uuidv4(), 
                 members: {
-                    connect: { 
+                    connectOrCreate: { 
+                        where: {
+                            profileId: profile.id,
+                        },
+                        create: {
                             profileId: profile.id,
                             role: "ADMIN"
+                        },
                     }
                 }
             }
@@ -75,7 +77,8 @@ export async function GET(res: Response) {
             inviteCode: true,
             members: {  
                 select: {
-                    role: true
+                    role: true,
+                    profileId: true
                 },
                 where: {
                     profileId: profile?.id,
@@ -88,6 +91,43 @@ export async function GET(res: Response) {
 
     } catch (error) {
         console.log("[SERVERS_COULDN'T_GET]", error);
+        return new NextResponse("Internal Error", {status: 500});
+    }
+}
+
+
+//Join a Room:
+export async function PUT(req: Request) {
+    try {
+        const { InviteCode } = await req.json();
+        const profile = await currentProfile();
+        
+        if(!profile) {
+            return new NextResponse("Unauthorized", { status:400 });
+        };
+        
+        const roomJoined = await db.room.update({
+            where: {
+                inviteCode: InviteCode
+            },
+            data: {
+                members: {
+                    connectOrCreate: { 
+                        where: {
+                            profileId: profile.id,
+                        },
+                        create: {
+                            profileId: profile.id,
+                        },
+                    }
+                }
+            }
+        });
+
+        return NextResponse.json(roomJoined);
+
+    } catch (error) {
+        console.log("[SERVERS_COULDN'T_PUT]", error);
         return new NextResponse("Internal Error", {status: 500});
     }
 }

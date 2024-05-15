@@ -30,7 +30,7 @@ model Room {
   id         String @id @default(uuid())
   name       String @unique
   imageUrl   String @db.Text
-  inviteCode String @db.Text
+  inviteCode String @unique
 
   members Member[] 
  

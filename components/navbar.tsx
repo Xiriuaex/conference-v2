@@ -8,7 +8,7 @@ const Navbar = () => {
    <nav className="flex-between fixed z-50 w-full bg-dark-1 x-6 py-4 lg:px-10">
     <Link
       href={"/"}
-      className=" gap-1 max-lg:pl-6"
+      className="flex flex-row gap-1 max-lg:pl-6"
     >
       <Image
         src={"..//icons/logo.svg"}

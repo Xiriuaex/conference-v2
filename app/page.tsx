@@ -1,56 +1,55 @@
 'use client'
 
-import { SignInButton, SignOutButton, SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs"
+import { SignInButton, SignOutButton, SignUpButton, SignedIn, SignedOut, currentUser } from "@clerk/nextjs"
  
-import { Button } from "@/components/ui/button"      
-import { useRouter } from "next/navigation";
-import { useEffect } from "react"; 
-import { currentProfile } from "@/lib/current-profile";
+import { Button } from "@/components/ui/button"       
+import Image from "next/image";
+import Link from "next/link";
 
-const Home = async() => {  
+const Home = () => {  
   
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleUserRedirect = async () => {
-      try {
-        const profile = await currentProfile();
-
-        if(profile){
-          router.push(`user/${profile?.id}`)
-        };
-
-        console.log("no user");
-      } catch (error) {
-        console.log("The Error from the server:", error);
-      } 
-     
-    };
-
-    handleUserRedirect();
-  }, [])
-
   return (
-    <div>
-      <h1>HOME PAGE</h1>
-      <br />
-      Login Buttons
-      <br />
-      <SignedIn>
-        <Button className="bg-blue-700 rounded-full text-white hover:bg-blue-800">
-          <SignOutButton />
-        </Button>
-      </SignedIn>
+   <div className="flex-center flex-col space-y-20">
+      <div className="mt-16 flex-center uppercase text-white font-bold text-3xl md:text-5xl">
+        <Image src={'../icons/logo.svg'} width={44} height={44} alt="logo-conference"/>
+        Conference
+      </div>
+
+      {/* if signed out */}
       <SignedOut>
-          <Button className="bg-blue-700 rounded-full text-white hover:bg-blue-800">
-            <SignInButton />
+        <div className="grid grid-cols-2 ">
+          <div>
+            <Button className="bg-blue-1 rounded-xl text-white hover:bg-blue-600 transition ease-in-out">
+              <SignInButton  redirectUrl={`user/${currentUser}`}/>
+            </Button>
+          </div>
+          <div>
+            <Button className="bg-blue-1 rounded-xl text-white hover:bg-blue-600 transition ease-in-out">
+              <SignUpButton />
+            </Button>
+          </div>
+        </div>
+
+        <div className="text-white uppercase font-semibold hover:text-emerald-300 transition">
+          <Link href={'/'} >Join a meeting as a guest</Link>
+        </div>
+      </SignedOut> 
+
+      {/* if signed In */}
+      <SignedIn>
+        <div className="text-white uppercase font-semibold text-2xl hover:text-sky-1 transition ease-in-out">
+          <Link  href={`user/${currentUser}`}>
+            My Rooms  
+          </Link>  
+        </div>   
+        <div>
+          <Button className="bg-blue-1 rounded-xl text-white hover:bg-blue-600 transition ease-in-out">           
+            <SignOutButton />
           </Button>
-        <Button className="bg-blue-700 rounded-full text-white hover:bg-blue-800">
-          <SignUpButton />
-        </Button>
-      </SignedOut>
-      <br />
-      Join an meeting as a guest:
+        </div>    
+      </SignedIn>
+
+
     </div>
   )
 }

@@ -16,29 +16,25 @@ import {
   } from '@/components/ui/form';
 
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Input } from "../ui/input"; 
 
 
-const CreateRoomForm = () => {
-  
+const JoinRoomForm = () => {
+
     const router = useRouter();
     
     //z resolver setup:
     const formSchema = z.object ({
-        name: z.string().min(1, {
-            message: "Room name is required!"
+        InviteCode: z.string().min(1, {
+            message: "Invite Code is required!"
         }),
-        imageUrl: z.string().min(1, {
-            message: "Room details is required!"
-        })
     });
 
     //create form and adds resolver and default input values:
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            imageUrl: "",
+            InviteCode: "",
         }
     });
 
@@ -46,7 +42,7 @@ const CreateRoomForm = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            await axios.post('/api/room', values);
+            await axios.put('/api/room', values); 
 
             form.reset();
             router.refresh();
@@ -58,17 +54,17 @@ const CreateRoomForm = () => {
     };
 
   return (
-    <div className="grid grid-cols-[2fr_1fr] bg-dark-3 rounded-xl">
+    <div className="grid grid-cols-[2fr_1fr] h-full bg-dark-3 rounded-xl">
         <Form {...form}>
            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4 py-4">
-                <div className="grid grid-rows-2 space-y-2"> 
+                <div> 
                     <FormField
                         control= {form.control}
-                        name= "name"
+                        name= "InviteCode"
                         render= {({ field }) => (
                             <FormItem>
                                 <FormLabel className="uppercase text-xs font-bold text-white dark:text-secondary/70">
-                                    Room Name
+                                    Room Invite Code
                                 </FormLabel>
                                 <FormControl>
                                     <Input 
@@ -81,30 +77,11 @@ const CreateRoomForm = () => {
                                 <FormMessage />
                             </FormItem>
                     )}/>
-                    <FormField 
-                        control={form.control}
-                        name="imageUrl"
-                        render= {({ field }) => (
-                            <FormItem>
-                                <FormLabel className="uppercase text-xs font-bold text-white dark:text-secondary/70 w-fit">
-                                    Image URL
-                                </FormLabel>
-                                <FormControl>
-                                    <Input 
-                                        disabled={isLoading}
-                                        className="bg-zinc-500/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                        placeholder="Enter server details"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>         
                 </div> 
 
                 <div>
                     <Button className="bg-dark-1 text-white hover:bg-dark-4" disabled={isLoading}>
-                        Create
+                        Join
                     </Button>
                 </div>
                 
@@ -114,4 +91,4 @@ const CreateRoomForm = () => {
   )
 }
 
-export default CreateRoomForm
+export default JoinRoomForm;

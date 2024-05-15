@@ -1,30 +1,51 @@
 'use server'
 
-import { currentUser } from "@clerk/nextjs";
+import { currentUser, redirectToSignIn } from "@clerk/nextjs";
 import { db } from "./db"; 
+import { currentProfile } from "./current-profile";
 
 
-export const roomIdMember = async () => {
+export const CurrentMember = async () => {
 
     const user = await currentUser();
 
-    if(!user) {
-        return null;
-    }
+    if( !user ){ 
+        return redirectToSignIn();
+    };
 
-    const memberRoomId = await db.member.findUnique({
+    const profile = await currentProfile();
+    
+    const member = await db.member.findUnique({
         where: {
-            id: user.id
+            profileId: profile?.id,
         },
-        include: {
+        select: {
+            profileId: true,
             rooms: {
                 select: {
                     id: true
                 }
             }
-        },
-    }); 
+        }
+    })
+    
 
-    console.log(memberRoomId);
-    return memberRoomId;
+    if(!member) {
+        const newMember = await db.member.create({
+            data: {
+                profileId: profile?.id!, 
+            },
+            select: {
+                profileId: true,
+                rooms: {
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        });
+
+        return newMember;
+    }
+    return member;
 }

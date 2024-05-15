@@ -31,6 +31,7 @@ const MeetingTypeList = () => {
     const [values, setValues] = useState(initialValues);
 
 
+    //creates meeting call:
     const createMeeting= async () => {
         if(!client || !user ) return;
 
@@ -80,7 +81,7 @@ const MeetingTypeList = () => {
 
 
   return (
-    <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
         <HomeCard
             img="..//icons/add-meeting.svg"
             title="New Meeting"
@@ -94,7 +95,7 @@ const MeetingTypeList = () => {
             className="bg-blue-1"
             handleClick={() => setMeetingState('isJoiningMeeting')}
         />
-        <HomeCard
+        <HomeCard 
             img="..//icons/schedule.svg"
             title="Schedule Meeting"
             description="Plan your meeting"
@@ -110,6 +111,8 @@ const MeetingTypeList = () => {
         />
 
         {!callDetails ? (
+
+            //here add data to the meeting database
             <MeetingModal
                 isOpen={meetingState === 'isScheduleMeeting'}
                 onClose={()=> setMeetingState(undefined)}

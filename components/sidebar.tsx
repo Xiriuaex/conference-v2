@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-
 const Sidebar = () => {
     const pathname = usePathname();
     const {id} = useParams();

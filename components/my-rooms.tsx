@@ -1,4 +1,3 @@
- 
 'use client'
 
 import React, { useEffect, useState } from 'react'
@@ -9,7 +8,6 @@ import {  RoomsListType } from "@/components/data-for-lists/data-list"
 import Loader from './Loader'
 import { Button } from './ui/button';
 import { currentProfile } from '@/lib/current-profile';
-import { roomIdMember } from '@/lib/current-member';
 
 const MyRooms = () => { 
 
@@ -29,6 +27,7 @@ const MyRooms = () => {
                     }
                   );
         
+        
       } catch (error) {
         console.log(error);
       }
@@ -40,7 +39,7 @@ const MyRooms = () => {
 
   
   const handleRouteToRoom = async (roomId: string) => {
-    const profile = await currentProfile();
+    const profile = await currentProfile(); 
     try {
       if(profile){
         router.push(`/room/${roomId}`);
@@ -66,14 +65,12 @@ const MyRooms = () => {
 
       <div className='bg-dark-2 flex-center flex-col rounded-xl mx-4 mb-4 overflow-auto'>
         {
+          (getRoom.length !== 0) ?
           getRoom.map((getRoom: RoomsListType) => (
             <Button onClick={() => handleRouteToRoom(getRoom.id)}>
-              <div className='bg-dark-4 grid grid-cols-[1fr_1fr_2fr_1fr] p-2 m-2 rounded-xl'>
+              <div className='bg-dark-1 grid grid-cols-[1fr_2fr_1fr] p-2 m-2 rounded-xl hover:bg-dark-4'>
                 <div>
                   <h1>{getRoom?.name}</h1>
-                </div>
-                <div>
-                  <h1>{getRoom?.role}</h1>
                 </div>
                 <div>
                   <h1>{getRoom?.inviteCode}</h1>
@@ -83,8 +80,8 @@ const MyRooms = () => {
                 </div>
               </div>
             </Button>
-            
-          ))
+          )) : 
+          <div>You are not a member of any room</div>
         }
         
       </div>

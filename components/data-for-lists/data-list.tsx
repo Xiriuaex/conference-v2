@@ -1,7 +1,3 @@
-'use client'
-
-import { ColumnDef } from "@tanstack/react-table";
- 
 export type RoomsListType = {
     id: string;
     name: string;
@@ -12,3 +8,11 @@ export type RoomsListType = {
     updatedAt?: Date;
 };
  
+export type MemberListType = {
+    id: string;
+    profileId: string;
+    role: 'ADMIN' | 'MEMBER';
+    createdAt?: Date;
+    updatedAt?: Date;
+    
+}
