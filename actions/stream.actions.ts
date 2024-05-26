@@ -1,12 +1,14 @@
 'use server'
 
+//code within here will only run on server
+
 import { currentProfile } from "@/lib/current-profile";
 import { StreamClient } from "@stream-io/node-sdk";
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 const apiSecret = process.env.STREAM_SECRET_KEY;
 
-export const tokenProvider= async() => {
+export const tokenProvider = async () => {
     const user = await currentProfile();
 
     if(!user) throw new Error('User is not logged in');

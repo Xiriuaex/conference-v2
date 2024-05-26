@@ -1,11 +1,15 @@
+import { auth } from '@/auth';
+import { NextRequest } from 'next/server';
 
-import { authMiddleware } from "@clerk/nextjs";  
-
-export default authMiddleware({
-    publicRoutes: ["/"],    
-  });
-
-export const config = {
-  matcher: ["/((?!.+.[w]+$|_next).*)", "/", "/(api|trpc)(.*)", "/room/:roomId"],
-};
-
+export default auth(async (request: NextRequest) => {
+    const currentUser = await auth();
+    
+    if (!currentUser?.user && !request.nextUrl.pathname.startsWith('/login')) {
+      return Response.redirect(new URL('/login', request.url))
+    }   
+ 
+  })
+  
+export const config = {   
+    matcher: ["/user", "/user/:id*", "/room/:id*"] 
+}

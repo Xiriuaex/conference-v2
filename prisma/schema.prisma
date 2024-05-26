@@ -1,60 +1,65 @@
-
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
-//profile has 1:1 relation with Member
-model Profile {
-  id       String @id @default(uuid())
-  userId   String @unique
-  name     String @unique
-  imageUrl String @db.Text
-  email    String @db.Text
-
-  member Member?
-
-  @@index([id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+ 
+generator client {
+  provider = "prisma-client-js"
 }
 
-//Room has m:1 relation with Member
-model Room {
-  id         String @id @default(uuid())
-  name       String @unique
-  imageUrl   String @db.Text
-  inviteCode String @unique
+model User {
+  id            String          @id @default(cuid())
+  userId        String?         @unique
+  name          String?
+  username      String?         @unique
+  email         String?         @unique
+  password      String? 
+  image         String?
 
-  members Member[] 
+  room      Room[]
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
+} 
+ 
 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+ 
 enum MemberRole {
   ADMIN
   MEMBER
 }
 
-//Member has 1:m relation with Room
-//Member has 1:1 relation with Profile
-model Member {
-  id   String     @id @default(uuid())
-  role MemberRole @default(MEMBER)
+model Room {
+  id         String @id @default(uuid())
+  name       String? @unique
+  imageUrl   String? @db.Text
+  inviteCode String? @unique
+  admin      String?  
+  user User[]
 
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId String  @unique
-
-  rooms Room[] 
-
-  @@index([profileId])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Meetings {
+  id String @id @default(cuid())
+  name String?
+  description String? @db.LongText
+  duration String? 
+  inviteCode String?
+
+  startingTime DateTime
+  endingTime DateTime
+  
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
 }

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Room` ADD COLUMN `admin` VARCHAR(191) NULL;

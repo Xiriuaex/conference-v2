@@ -1,28 +1,42 @@
+//@ts-nocheck
 'use client'
 
 import { useRouter } from "next/navigation";
 import HomeCard from "./home-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MeetingModal from "./meeting-modal";
 import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
-import { useUser } from "@clerk/nextjs";
 import { useToast } from "./ui/use-toast";
 import { Textarea } from "./ui/textarea";
-import { ReactDatePicker } from 'react-datepicker';
+import DatePicker from "react-datepicker";
+import { currentProfile } from "@/lib/current-profile"; 
 
 
 const MeetingTypeList = () => {
-    
-    const { toast } = useToast();
 
+    //all the states:
+    const [user, setUser] = useState();
+    const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
+   
+     
+    //get user from currentProfile:
+    useEffect(() => {
+        const funct = async () => {
+            const currentUser = await currentProfile();
+            setUser(currentUser);
+        };
+
+        funct();
+    },[]);
+    
+    //toast and useRouter:
+    const { toast } = useToast();
     const router = useRouter();
 
-    const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
-    
-    const {user} = useUser();
+    //get the client created:
     const client = useStreamVideoClient();
-    const [callDetails, setCallDetails] = useState<Call>();
     
+    //intial values of a call:
     const initialValues = {
         dateTime: new Date(),
         description: '',
@@ -30,12 +44,22 @@ const MeetingTypeList = () => {
     };
     const [values, setValues] = useState(initialValues);
 
-
+    const [callDetails, setCallDetails] = useState<Call>();
+    
     //creates meeting call:
     const createMeeting= async () => {
         if(!client || !user ) return;
 
         try {
+            const callId = crypto.randomUUID();
+            //create a call:
+            const call = client.call("default", callId);
+            if(!call) throw new Error("Failed to create call!");
+            
+            //meeting start time and description of the call:
+            const startsAt = initialValues.dateTime.toISOString() || new Date(Date.now()).toISOString();
+            const description = initialValues.description || "Instant Meeting";
+            
             
             if(!initialValues.dateTime) {
                 toast({
@@ -44,16 +68,8 @@ const MeetingTypeList = () => {
                   return;
             }
 
-            const id = crypto.randomUUID();
-            const call = client.call('default', id);
-
-            if(!call) throw new Error("Failed to create call");
-
-            const startsAt = initialValues.dateTime.toISOString() || new Date(Date.now()).toISOString();
-            const description = initialValues.description || "Instant Meeting";
-
             await call.getOrCreate({
-                data: {
+                data: { 
                     starts_at: startsAt,
                     custom: {
                         description,
@@ -63,11 +79,11 @@ const MeetingTypeList = () => {
 
             setCallDetails(call);
 
+            toast({ title: "Meeting Created!" });
+
             if(!initialValues.description) {
                 router.push(`/meeting/${call.id}`);
             };
-
-            toast({ title: "Meeting Created!" });
 
         } catch (error) {
             console.log(error);
@@ -110,9 +126,7 @@ const MeetingTypeList = () => {
             handleClick={() => router.push('/recordings')}
         />
 
-        {!callDetails ? (
-
-            //here add data to the meeting database
+        {!callDetails ? ( 
             <MeetingModal
                 isOpen={meetingState === 'isScheduleMeeting'}
                 onClose={()=> setMeetingState(undefined)}
@@ -134,7 +148,7 @@ const MeetingTypeList = () => {
                     <label className="text-base font-normal leading-[22.4px] text-sky-2">
                     Select Date and Time
                     </label>
-                    <ReactDatePicker
+                    <DatePicker
                         selected={values.dateTime}
                         onChange={({date} : {date: Date}) => setValues({ ...values, dateTime: date! })}
                         showTimeSelect
@@ -146,8 +160,8 @@ const MeetingTypeList = () => {
                     />
                 </div>
             </MeetingModal>
-        ) : 
-            <MeetingModal
+        ) :         
+          (  <MeetingModal
                 isOpen={meetingState === 'isScheduleMeeting'}
                 onClose={()=> setMeetingState(undefined)}
                 title={"Meeting Created"}
@@ -159,7 +173,7 @@ const MeetingTypeList = () => {
                 image="icons/checked.svg"
                 buttonIcon="icons/copy.svg"
                 buttonText="Copy Meeting Link"
-            />
+            />)
         }
         <MeetingModal
             isOpen={meetingState === 'isInstantMeeting'}

@@ -1,12 +1,13 @@
 'use client'
 
+
+import { auth } from "@/auth";
 import MeetingTypeList from "@/components/meeting-type-list";
-import MemberCore from "@/components/member-core";
-import { CurrentMember } from "@/lib/current-member";
+import MemberCore from "@/components/member-core"; 
+import useUser from "@/hooks/useUser";
 import { currentProfile } from "@/lib/current-profile";
-import Error from "next/error";
-import { useParams, useRouter } from "next/navigation"; 
-import { NextRequest, NextResponse } from "next/server";
+import { redirect, useParams, useRouter } from "next/navigation";
+import { NextRequest } from "next/server";
 import { useEffect } from "react";
 
 type memberType = {
@@ -26,30 +27,22 @@ type CurrentMemberType = {
 }
 
 const personalHomePage = ({name, role, inviteCode, members}: personalPagePropsType, req: NextRequest) => {  
-
-  const router = useRouter(); 
+  const tag:{tag: string} = useParams<{ tag: string }>()
+  const {user} = useUser();
+  const router = useRouter();
+  
   useEffect(() => {
-    const authorization =  async () => {
-      try { 
-        const member:CurrentMemberType = await CurrentMember();
-        if(req.nextUrl.pathname.startsWith("/room/")){
-          if(member.id === router.) {
-            console.log("yes")
-          } else {
-            return new NextResponse("Unauthorized", { status: 400});
-          } 
-        } 
-      } catch (error) {
-          console.log("[COULDN'T_GET]", error);
-          return new NextResponse("Internal Error", {status: 500});
-        }
-        return;
-    };
+      const id = JSON.stringify(tag);
+  
+    const checkUser = async () => {
+      const user = await currentProfile();
+      if(!user) redirect("/login");
+      else return;
+    }
+    checkUser();
 
-    authorization();
-  }, [router.pathname])
- 
- 
+  }, []);
+  
   const now = new Date();
 
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -69,7 +62,7 @@ const personalHomePage = ({name, role, inviteCode, members}: personalPagePropsTy
         </div>
 
         <div className="bg-dark-3 pt-4 rounded-[14px] overflow-auto">
-          <MemberCore />
+          {/* <MemberCore /> */}
         </div>
       </div>
 

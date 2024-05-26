@@ -7,28 +7,27 @@ import MeetingRoom from "@/components/meeting-room";
 import MeetingSetup from "@/components/meeting-setup";
 import { useGetCallById } from "@/hooks/useGetCallById";
 
-import { useUser } from "@clerk/nextjs"
-import { StreamCall, StreamTheme } from "@stream-io/video-react-sdk";
-
+import { StreamCall, StreamTheme, useConnectedUser } from "@stream-io/video-react-sdk";
 
 const Meeting = ({ params: { id } }: { params: { id:string } }) => {
 
-    const { user, isLoaded } = useUser();
-    const [ isSetupComplete, setIsSetupComplete ] = useState(false);
-
+  //Here we check for the video and audio setup completed or not:
+    const [ isSetupComplete, setIsSetupComplete ] = useState(true);
+     
     const { call, isCallLoading } = useGetCallById(id);
-
-   if(!isLoaded || isCallLoading) return <Loader />
+    
+    if(isCallLoading) return <Loader />
 
    if (!call) return (
     <p className="text-center text-3xl font-bold text-white">
-      Call Not Found
+      There are no Call Found
     </p>
   );
 
+  //first check in which call we are in: using custom hooks
   return (
     <main className="h-screen w-full">
-        <StreamCall call={call}>
+        <StreamCall call={call}> 
             <StreamTheme>
                 {!isSetupComplete ? (
                     <MeetingSetup setIsSetupComplete={setIsSetupComplete}/>

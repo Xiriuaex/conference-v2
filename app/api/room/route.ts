@@ -1,5 +1,6 @@
 
 
+import { auth } from "@/auth";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db"; 
 import { NextResponse } from "next/server";
@@ -20,7 +21,7 @@ interface typeRoom {
 export async function POST(req: Request) {
     try {
         const { name, imageUrl } = await req.json();
-        const profile = await currentProfile();
+        const profile = await <typeRoom>currentProfile();
 
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
@@ -30,20 +31,15 @@ export async function POST(req: Request) {
             data: {
                 name,
                 imageUrl,
-                inviteCode: uuidv4(), 
-                members: {
-                    connectOrCreate: { 
-                        where: {
-                            profileId: profile.id,
-                        },
-                        create: {
-                            profileId: profile.id,
-                            role: "ADMIN"
-                        },
+                inviteCode: uuidv4(),
+                admin: profile.name, 
+                user: {
+                    connect: {  
+                        id:profile.id,
                     }
                 }
             }
-        })
+        });  
 
         return NextResponse.json(room);
         
@@ -57,7 +53,7 @@ export async function POST(req: Request) {
 //Get all The Rooms:
 export async function GET(res: Response) {
     try {
-        const profile = await currentProfile();
+        const profile = await <typeRoom>currentProfile();
  
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
@@ -65,9 +61,9 @@ export async function GET(res: Response) {
 
         const room = await db.room.findMany({
           where: {
-            members: {
+            user: {
               some: {
-                profileId: profile?.id
+                id: profile.id,
               }
             }
           },
@@ -75,13 +71,13 @@ export async function GET(res: Response) {
             id: true,
             name: true, 
             inviteCode: true,
-            members: {  
+            user: {  
                 select: {
                     role: true,
-                    profileId: true
+                    id: true
                 },
                 where: {
-                    profileId: profile?.id,
+                    id: profile?.id,
                   },
             },
           }, 
@@ -96,38 +92,38 @@ export async function GET(res: Response) {
 }
 
 
-//Join a Room:
-export async function PUT(req: Request) {
-    try {
-        const { InviteCode } = await req.json();
-        const profile = await currentProfile();
+// //Join a Room:
+// export async function PUT(req: Request) {
+//     try {
+//         const { InviteCode } = await req.json();
+//         const profile = await currentProfile();
         
-        if(!profile) {
-            return new NextResponse("Unauthorized", { status:400 });
-        };
+//         if(!profile) {
+//             return new NextResponse("Unauthorized", { status:400 });
+//         };
         
-        const roomJoined = await db.room.update({
-            where: {
-                inviteCode: InviteCode
-            },
-            data: {
-                members: {
-                    connectOrCreate: { 
-                        where: {
-                            profileId: profile.id,
-                        },
-                        create: {
-                            profileId: profile.id,
-                        },
-                    }
-                }
-            }
-        });
+//         const roomJoined = await db.room.update({
+//             where: {
+//                 inviteCode: InviteCode
+//             },
+//             data: {
+//                 members: {
+//                     connectOrCreate: { 
+//                         where: {
+//                             profileId: profile.id,
+//                         },
+//                         create: {
+//                             profileId: profile.id,
+//                         },
+//                     }
+//                 }
+//             }
+//         });
 
-        return NextResponse.json(roomJoined);
+//         return NextResponse.json(roomJoined);
 
-    } catch (error) {
-        console.log("[SERVERS_COULDN'T_PUT]", error);
-        return new NextResponse("Internal Error", {status: 500});
-    }
-}
+//     } catch (error) {
+//         console.log("[SERVERS_COULDN'T_PUT]", error);
+//         return new NextResponse("Internal Error", {status: 500});
+//     }
+// }

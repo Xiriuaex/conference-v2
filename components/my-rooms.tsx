@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import {  RoomsListType } from "@/components/data-for-lists/data-list"
 import Loader from './Loader'
 import { Button } from './ui/button';
-import { currentProfile } from '@/lib/current-profile';
+import { currentProfile } from '@/lib/current-profile'; 
 
 const MyRooms = () => { 
 
@@ -15,7 +15,7 @@ const MyRooms = () => {
   const [getRoom, setGetRoom] = useState<RoomsListType[]>([]);
 
   const router = useRouter();
-
+  
   useEffect(() => {
     const handleGetRoom = async () => {
       try {
@@ -27,7 +27,6 @@ const MyRooms = () => {
                     }
                   );
         
-        
       } catch (error) {
         console.log(error);
       }
@@ -36,6 +35,15 @@ const MyRooms = () => {
     handleGetRoom();
     
   }, []);
+
+  const handleDelete = () => {
+
+  };
+
+  const handleExit = () => {
+
+  }
+
 
   
   const handleRouteToRoom = async (roomId: string) => {
@@ -76,7 +84,12 @@ const MyRooms = () => {
                   <h1>{getRoom?.inviteCode}</h1>
                 </div>
                 <div>
-                  delete/quit
+                  {getRoom.admin !== "" ? (
+                    <h1>Admin</h1>
+                  ):
+                    <h1>Member</h1>
+                  }
+                 
                 </div>
               </div>
             </Button>
