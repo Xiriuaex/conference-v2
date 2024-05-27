@@ -1,7 +1,5 @@
 'use client'
 
-
-import { auth } from "@/auth";
 import MeetingTypeList from "@/components/meeting-type-list";
 import MemberCore from "@/components/member-core"; 
 import useUser from "@/hooks/useUser";
@@ -14,6 +12,7 @@ type memberType = {
   role: string,
   profileId: string,
 }
+
 type personalPagePropsType = {
   name: string,
   role: string,
