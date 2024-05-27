@@ -5,37 +5,22 @@ import { useRouter } from "next/navigation";
 import HomeCard from "./home-card";
 import { useEffect, useState } from "react";
 import MeetingModal from "./meeting-modal";
-import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
+import { Call, StreamVideo, StreamVideoClient } from "@stream-io/video-react-sdk";
 import { useToast } from "./ui/use-toast";
 import { Textarea } from "./ui/textarea";
 import DatePicker from "react-datepicker";
-import { currentProfile } from "@/lib/current-profile"; 
+import useGetClient from "@/hooks/useGetClient";
 
 
 const MeetingTypeList = () => {
 
-    //all the states:
-    const [user, setUser] = useState();
+    const client = useGetClient;
     const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
    
-     
-    //get user from currentProfile:
-    useEffect(() => {
-        const funct = async () => {
-            const currentUser = await currentProfile();
-            setUser(currentUser);
-        };
-
-        funct();
-    },[]);
-    
     //toast and useRouter:
     const { toast } = useToast();
     const router = useRouter();
 
-    //get the client created:
-    const client = useStreamVideoClient();
-    
     //intial values of a call:
     const initialValues = {
         dateTime: new Date(),
@@ -51,6 +36,11 @@ const MeetingTypeList = () => {
         if(!client || !user ) return;
 
         try {
+            if (!values.dateTime) {
+                toast({ title: 'Please select a date and time' });
+                return;
+            };
+
             const callId = crypto.randomUUID();
             //create a call:
             const call = client.call("default", callId);
@@ -60,14 +50,6 @@ const MeetingTypeList = () => {
             const startsAt = initialValues.dateTime.toISOString() || new Date(Date.now()).toISOString();
             const description = initialValues.description || "Instant Meeting";
             
-            
-            if(!initialValues.dateTime) {
-                toast({
-                    title: "Please select a date and time",
-                  });
-                  return;
-            }
-
             await call.getOrCreate({
                 data: { 
                     starts_at: startsAt,
@@ -76,14 +58,12 @@ const MeetingTypeList = () => {
                     },
                 },
             });
-
             setCallDetails(call);
 
-            toast({ title: "Meeting Created!" });
-
-            if(!initialValues.description) {
+            if(!values.description) {
                 router.push(`/meeting/${call.id}`);
-            };
+            };      
+            toast({ title: "Meeting Created!" });
 
         } catch (error) {
             console.log(error);
@@ -91,12 +71,13 @@ const MeetingTypeList = () => {
                 title: "Failed to create Meeting!",
               })
         }
-    };
+    }; 
 
     const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/room/[roomId]/meeting/${callDetails?.id}`;
 
 
   return (
+    <StreamVideo client={client}>  
     <section className="grid grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
         <HomeCard
             img="..//icons/add-meeting.svg"
@@ -184,7 +165,7 @@ const MeetingTypeList = () => {
             handleClick={createMeeting} 
         />
     </section>
-
+  </StreamVideo>
   )
 }
 

@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 const useUser = () => {
 
     const [user, setUser] = useState<userType>();
-    const [isLoaded, setIsLoaded] = useState(false);
     useEffect(() => {
         const getUser = async () => {
             try {
@@ -21,10 +20,9 @@ const useUser = () => {
         };
 
         getUser();
-        setIsLoaded(true);
     }, []);
 
-    return { user, isLoaded };
+    return { user };
     
 }
 

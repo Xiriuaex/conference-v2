@@ -20,7 +20,7 @@ const Meeting = ({ params: { id } }: { params: { id:string } }) => {
 
    if (!call) return (
     <p className="text-center text-3xl font-bold text-white">
-      There are no Call Found
+      There are no Call
     </p>
   );
 
