@@ -20,18 +20,20 @@ const useGetClient = () => {
             const client = new StreamVideoClient({
                 apiKey: API_KEY,
                 user: {
-                    id: user.id,
-                    name: user.name || user.id,
-                    image: user.image || undefined,
+                  id: user?.id,
+                  name: user?.username || user?.id,
+                  image: user?.image || undefined,
                 },
-                tokenProvider
+                tokenProvider,
             });
+
             setVideoClient(client);
         } catch (error) {
             console.error('Error initializing Stream Video client:', error);
         }
     }, [user]);
-  return videoClient;
+
+  return {videoClient};
 }
 
 export default useGetClient

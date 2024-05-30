@@ -1,6 +1,4 @@
 'use client';
-
-import { auth } from '@/auth';
 import { userType } from '@/components/data-for-lists/data-list';
 import { currentProfile } from '@/lib/current-profile';
 import { useEffect, useState } from 'react';

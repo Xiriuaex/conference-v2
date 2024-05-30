@@ -73,7 +73,6 @@ export async function GET(res: Response) {
             inviteCode: true,
             user: {  
                 select: {
-                    role: true,
                     id: true
                 },
                 where: {

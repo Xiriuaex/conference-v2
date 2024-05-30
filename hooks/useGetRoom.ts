@@ -1,9 +1,7 @@
 'use client';
 
-import { auth } from '@/auth';
-import { roomType, userType } from '@/components/data-for-lists/data-list';
-import { currentProfile } from '@/lib/current-profile';
-import { db } from '@/lib/db';
+import { roomType } from '@/components/data-for-lists/data-list';
+import { currentRoom } from '@/lib/current-room';
 import { useEffect, useState } from 'react';
 
 
@@ -13,6 +11,8 @@ const useGetRoom = () => {
     useEffect(() => {
         const getRoom = async () => {
             try { 
+                const room = await currentRoom();
+                setRoom(room);
             } catch (error) {
                 console.log("Can't get Room:", error);
             }
@@ -20,6 +20,7 @@ const useGetRoom = () => {
 
         getRoom();
        
+        console.log(room?.id)
     }, []);
 
     return { room };

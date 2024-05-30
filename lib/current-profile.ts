@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "./db";
-import { CreateProfile } from "./create-profile";
+
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
@@ -17,7 +17,5 @@ export const currentProfile = async () => {
             email,
         }
     })
-    
-    console.log(user?.email);
     return user as any;
 }

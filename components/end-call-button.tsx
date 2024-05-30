@@ -4,17 +4,19 @@ import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import useGetRoom from '@/hooks/useGetRoom';
 
 const EndCallButton = () => {
   const call = useCall();
   const router = useRouter();
-
+  const {room} = useGetRoom(); 
+   
   if (!call)
     throw new Error(
       'useStreamCall must be used within a StreamCall component.',
     );
 
-const { useLocalParticipant } = useCallStateHooks();
+  const { useLocalParticipant } = useCallStateHooks();
   const localParticipant = useLocalParticipant();
 
   const isMeetingOwner =
@@ -26,7 +28,7 @@ const { useLocalParticipant } = useCallStateHooks();
 
   const endCall = async () => {
     await call.endCall();
-    router.push('/room/[roomId]/');
+    router.push(`/room/${room?.id}`);
   };
 
   return (

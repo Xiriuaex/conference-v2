@@ -1,70 +1,74 @@
+/* eslint-disable camelcase */
 //@ts-nocheck
 'use client'
 
 import { useRouter } from "next/navigation";
 import HomeCard from "./home-card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MeetingModal from "./meeting-modal";
 import { Call, StreamVideo, StreamVideoClient } from "@stream-io/video-react-sdk";
 import { useToast } from "./ui/use-toast";
 import { Textarea } from "./ui/textarea";
 import DatePicker from "react-datepicker";
 import useGetClient from "@/hooks/useGetClient";
+import useUser from "@/hooks/useUser";
+import Loader from "./Loader";
 
+//intial values of a call:
+const initialValues = {
+    dateTime: new Date(),
+    description: '',
+    link: '',
+};
 
 const MeetingTypeList = () => {
-
-    const client = useGetClient;
-    const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
-   
     //toast and useRouter:
     const { toast } = useToast();
     const router = useRouter();
 
-    //intial values of a call:
-    const initialValues = {
-        dateTime: new Date(),
-        description: '',
-        link: '',
-    };
-    const [values, setValues] = useState(initialValues);
+    const {videoClient} = useGetClient();
+    const {user} = useUser();
 
+    const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
+
+
+    const [values, setValues] = useState(initialValues);
     const [callDetails, setCallDetails] = useState<Call>();
     
     //creates meeting call:
     const createMeeting= async () => {
-        if(!client || !user ) return;
+        if(!videoClient || !user ) return;
 
         try {
             if (!values.dateTime) {
                 toast({ title: 'Please select a date and time' });
                 return;
-            };
+            }
 
-            const callId = crypto.randomUUID();
+            const id = crypto.randomUUID();
             //create a call:
-            const call = client.call("default", callId);
-            if(!call) throw new Error("Failed to create call!");
-            
+            const call = videoClient.call('default', id);
+            if (!call) throw new Error('Failed to create meeting');
+
+
             //meeting start time and description of the call:
-            const startsAt = initialValues.dateTime.toISOString() || new Date(Date.now()).toISOString();
-            const description = initialValues.description || "Instant Meeting";
-            
+            const startsAt = values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+            const description = values.description || 'Instant Meeting';
             await call.getOrCreate({
-                data: { 
-                    starts_at: startsAt,
-                    custom: {
-                        description,
-                    },
+                data: {
+                starts_at: startsAt,
+                custom: {
+                    description,
+                },
                 },
             });
             setCallDetails(call);
-
-            if(!values.description) {
+            if (!values.description) {
                 router.push(`/meeting/${call.id}`);
-            };      
-            toast({ title: "Meeting Created!" });
-
+            }
+            toast({
+                title: 'Meeting Created',
+            });
         } catch (error) {
             console.log(error);
             toast({
@@ -73,11 +77,11 @@ const MeetingTypeList = () => {
         }
     }; 
 
+    if (!videoClient || !user) return <Loader />;
+
     const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/room/[roomId]/meeting/${callDetails?.id}`;
 
-
-  return (
-    <StreamVideo client={client}>  
+  return ( 
     <section className="grid grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
         <HomeCard
             img="..//icons/add-meeting.svg"
@@ -165,7 +169,6 @@ const MeetingTypeList = () => {
             handleClick={createMeeting} 
         />
     </section>
-  </StreamVideo>
   )
 }
 

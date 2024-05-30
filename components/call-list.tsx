@@ -1,4 +1,3 @@
-//@ts-nocheck
 
 'use client'
 
@@ -7,6 +6,8 @@ import { Call, CallRecording } from "@stream-io/video-react-sdk";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import MeetingCard from "./meeting-card";
+import Loader from "./Loader";
+import { LucideLoaderCircle } from "lucide-react";
 
 
 const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings'}) => {
@@ -46,7 +47,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings'}) => {
     const calls = getCalls();
     const NoCallsMessage = getNoCallsMessage();
     
-    if (isLoading) return <Loader />;
+    if (isLoading) return <LucideLoaderCircle />;
 
     return (
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">

@@ -1,16 +1,13 @@
-
+'use client'
 import Image from "next/image"
 import Link from "next/link"
-import MobileNav from "@/components/mobile-navbar"; 
-import { auth } from "@/auth";   
-import { SignOut } from "./auth/signOut";
-import { useEffect, useState } from "react";
-import { currentProfile } from "@/lib/current-profile";
-
+import useUser from "@/hooks/useUser";
 
 const Navbar = () => { 
 
-    
+  
+  const user = useUser();
+
   return (
    <nav className="flex-between relative z-50 w-full bg-dark-1 x-6 py-4 lg:px-10">
     <Link
@@ -28,14 +25,16 @@ const Navbar = () => {
         Conference
       </p>
     </Link> 
-    {session ?
+    {user.user ?
       <div className="flex flex-row justify-center space-x-4">
-        <div className="text-white uppercase font-semibold text-2xl hover:text-sky-1 transition ease-in-out">
-         <SignOut />
-        </div>
-        <div className="text-white uppercase font-semibold text-2xl hover:text-sky-1 transition ease-in-out">
+        <div className="text-white uppercase font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
           <Link  href={`/rooms/:id`}>
-            My Rooms  
+            Logout 
+          </Link>  
+        </div>
+        <div className="text-white uppercase font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
+          <Link  href={`/user/${user.user.id}`}>
+            Home 
           </Link>  
         </div>
       </div> :
@@ -54,10 +53,6 @@ const Navbar = () => {
           </div>
         </div> 
       }
-      <div className="flex-between gap-5">
-        <MobileNav />
-      </div>
-
    </nav>
   )
 }
