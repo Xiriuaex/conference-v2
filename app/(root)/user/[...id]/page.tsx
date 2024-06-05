@@ -2,10 +2,25 @@
 
 import CreateRoomForm from "@/components/forms/create-room-form";
 import JoinRoomForm from "@/components/forms/join-room-form";
-import MyRooms from "@/components/my-rooms";
+import MyRooms from "@/components/my-rooms"; 
 import useUser from "@/hooks/useUser";
+import { usePathname, useRouter } from "next/navigation";
+import Denied from "../../Denied/page";
+import Loader from "@/components/Loader";
+
 
 const UserHome = () => { 
+   
+    const {user} = useUser();
+    const id = user?.id;
+    const path: string | undefined = usePathname();
+
+    if(!user){
+      return <Loader/>
+    }
+    if(!path.match(`/user/${id}`)) {
+      return <Denied/>
+    } 
 
   return (
     <div className="relative"> 

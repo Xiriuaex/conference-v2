@@ -6,7 +6,7 @@ import useUser from "@/hooks/useUser";
 const Navbar = () => { 
 
   
-  const user = useUser();
+  const {user} = useUser();
 
   return (
    <nav className="flex-between relative z-50 w-full bg-dark-1 x-6 py-4 lg:px-10">
@@ -25,7 +25,7 @@ const Navbar = () => {
         Conference
       </p>
     </Link> 
-    {user.user ?
+    {user ?
       <div className="flex flex-row justify-center space-x-4">
         <div className="text-white uppercase font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
           <Link  href={`/rooms/:id`}>
@@ -33,7 +33,7 @@ const Navbar = () => {
           </Link>  
         </div>
         <div className="text-white uppercase font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
-          <Link  href={`/user/${user.user.id}`}>
+          <Link  href={`/user/${user.id}`}>
             Home 
           </Link>  
         </div>

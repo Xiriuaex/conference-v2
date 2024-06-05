@@ -2,20 +2,22 @@
 
 import { db } from "./db";
 
-import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { auth } from "@/auth"; 
 
 export const currentProfile = async () => {
     const session = await auth();
     const email = <string>session?.user?.email;
-    if(!session?.user) { 
-        return new NextResponse("Unauthorized", { status:400 });
+    let user = null;
+    if(!session?.user) {  
+        console.log("from current profile server")
+        return user as any;
     };
 
-    const user = await db.user.findUnique({
+    user = await db.user.findUnique({
         where: {
             email,
         }
-    })
+    });
+    
     return user as any;
 }

@@ -58,7 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async session ({ session, token }) {
             if (session?.user) {
-              session.user.id  = token.sub;
+              session.user.id  = token.sub as string;
             }
             return session;
         },  
@@ -69,7 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                         const alreadyUser = await db.user.findUnique({
                             where: {
-                                email
+                                email: email as string
                             }, 
                          });
 

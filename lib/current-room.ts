@@ -3,8 +3,6 @@
 import { db } from "./db"; 
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
-import { currentProfile } from "./current-profile";
-
 export const currentRoom = async () => {
     const session = await auth();
     const email = <string>session?.user?.email; 

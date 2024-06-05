@@ -11,16 +11,16 @@ const useGetRoom = () => {
     useEffect(() => {
         const getRoom = async () => {
             try { 
-                const room = await currentRoom();
+                const room: roomType = await currentRoom();
                 setRoom(room);
             } catch (error) {
-                console.log("Can't get Room:", error);
+                console.log("Can't get Room.", error);
             }
         };
 
         getRoom();
        
-        console.log(room?.id)
+        console.log(room?.name)
     }, []);
 
     return { room };

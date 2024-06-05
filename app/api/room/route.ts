@@ -90,39 +90,40 @@ export async function GET(res: Response) {
     }
 }
 
+//Join a Room:
+export async function PUT(req: Request) {
+    try {
+        const { InviteCode } = await req.json();
+        const profile = await <typeRoom>currentProfile();
+ 
+        if(!profile) {
+            return new NextResponse("Unauthorized", { status:400 });
+        } 
 
-// //Join a Room:
-// export async function PUT(req: Request) {
-//     try {
-//         const { InviteCode } = await req.json();
-//         const profile = await currentProfile();
         
-//         if(!profile) {
-//             return new NextResponse("Unauthorized", { status:400 });
-//         };
-        
-//         const roomJoined = await db.room.update({
-//             where: {
-//                 inviteCode: InviteCode
-//             },
-//             data: {
-//                 members: {
-//                     connectOrCreate: { 
-//                         where: {
-//                             profileId: profile.id,
-//                         },
-//                         create: {
-//                             profileId: profile.id,
-//                         },
-//                     }
-//                 }
-//             }
-//         });
+        const roomJoined = await db.room.update({
+            where: {
+                inviteCode: InviteCode
+            },
+            data: {
+                admin: '', 
+                user: {
+                    connectOrCreate: { 
+                        where: {
+                            id: profile.id,
+                        },
+                        create: {
+                            id: profile.id,
+                        },
+                    }
+                }
+            }
+        });
 
-//         return NextResponse.json(roomJoined);
+        return NextResponse.json(roomJoined);
 
-//     } catch (error) {
-//         console.log("[SERVERS_COULDN'T_PUT]", error);
-//         return new NextResponse("Internal Error", {status: 500});
-//     }
-// }
+    } catch (error) {
+        console.log("[SERVERS_COULDN'T_PUT]", error);
+        return new NextResponse("Internal Error", {status: 500});
+    }
+}

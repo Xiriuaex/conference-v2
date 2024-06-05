@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { userType } from '@/components/data-for-lists/data-list';
 import { currentProfile } from '@/lib/current-profile';
 import { useEffect, useState } from 'react';
@@ -10,10 +10,10 @@ const useUser = () => {
     useEffect(() => {
         const getUser = async () => {
             try {
-                const user = await currentProfile();
+                const user: userType = await currentProfile();
                 setUser(user);
             } catch (error) {
-                console.log("Can't get user:", error);
+                console.log("Can't get user.", error);
             }
         };
 

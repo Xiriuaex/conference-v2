@@ -1,4 +1,4 @@
-
+ 
 import { signIn } from "@/auth"
 import LoginForm from "@/components/forms/login-form"
 import { Button } from "@/components/ui/button"
@@ -10,18 +10,12 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card" 
-import useUser from "@/hooks/useUser"
+  
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { useEffect } from "react"
 
 const Page = () => {
 
-    const {user} = useUser();
-    console.log(user?.id)
-    if(user) redirect(`/user/${user?.id}`);
-
-    
+    console.log("what the fuck 3")
   return (
     <div className="flex-center h-dvh text-white">
         <Card>

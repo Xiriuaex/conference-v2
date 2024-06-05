@@ -1,12 +1,15 @@
 'use client'
-
+ 
 import MeetingTypeList from "@/components/meeting-type-list";
-import MemberCore from "@/components/member-core"; 
+import MemberCore from "@/components/member-core";
+import Sidebar from "@/components/sidebar";
 import useUser from "@/hooks/useUser";
-
-const personalHomePage = () => {  
-  const {user} = useUser();
-  const now = new Date();
+ 
+const personalHomePage = () => { 
+  
+  const {user}= useUser();
+ 
+  const now = new Date(); 
 
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   const date = (new Intl.DateTimeFormat('en-US', { dateStyle: 'full' })).format(now);
@@ -28,12 +31,12 @@ const personalHomePage = () => {
         </div>
 
         <div className="bg-dark-3 pt-4 rounded-[14px] overflow-auto">
-          {/* <MemberCore /> */}
+          <MemberCore />
         </div>
       </div>
 
       <MeetingTypeList />
-    </section>
+    </section> 
   )
 }
 
