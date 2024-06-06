@@ -23,20 +23,16 @@ const UserHome = () => {
     } 
 
   return (
-    <div className="relative"> 
-      <div className="flex-center pt-28">
-        <div className='grid grid-rows-[1fr_4fr] w-[45vw] h-[50vh] my-5 text-white'>
-          <div className='grid grid-rows-1 xl:grid-cols-2'>
-            <div className="m-2">
-              <CreateRoomForm />
-            </div>
-            <div className='m-2 flex-center'>
-              <JoinRoomForm />
-            </div>
+    <div className="relative">  
+        <div className='grid grid-cols-[1fr_2fr] text-white'>
+          <div className='grid xl:grid-rows-[1fr_.5fr] gap-3 mx-10'> 
+              <CreateRoomForm />  
+              <JoinRoomForm /> 
           </div> 
-            <MyRooms />  
-        </div>  
-      </div>
+          <div className="flex-center">
+            <MyRooms />
+          </div>
+        </div>   
     </div>
   )
 }
