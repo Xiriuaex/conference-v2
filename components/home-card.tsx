@@ -3,16 +3,9 @@
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
+import { HomeCardProps } from './data-for-lists/data-list';
 
 
-interface HomeCardProps {
-    className?: string;
-    img: string;
-    title: string;
-    description: string;
-    handleClick?: () => void;
-  }
-  
 const HomeCard = ({ 
     className, 
     img, 

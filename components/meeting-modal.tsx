@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 
 import {
   Dialog,
@@ -12,20 +10,7 @@ import {
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-
-
-interface MeetingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title:string;
-  className?: string;
-  children?: ReactNode;
-  handleClick?: () => void;
-  buttonText?: string;
-  image?: string;
-  buttonIcon?: string;
-}
-
+import { MeetingModalProps } from "./data-for-lists/data-list";
 
 const MeetingModal = ({
   isOpen,

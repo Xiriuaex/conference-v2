@@ -1,6 +1,7 @@
  
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./middleware"; 
+import { currentRooms } from "./lib/current-user-room";
 export { auth } from "@/auth"
     
 export const middleware = async (request: Request) =>  {

@@ -44,8 +44,7 @@ const SignUpForm = async() => {
                 username: name,
                 name,
                 email,
-                password: hashedPassword, 
-                role: "MEMBER", 
+                password: hashedPassword,  
             }
         }); 
 

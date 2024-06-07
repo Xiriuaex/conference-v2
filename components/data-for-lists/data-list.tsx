@@ -1,22 +1,4 @@
-export type RoomsListType = {
-    id: string;
-    name: string;
-    role: 'ADMIN' | 'MEMBER';
-    admin: string; 
-    imageUrl?: string;
-    inviteCode: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-};
- 
-export type MemberListType = {
-    id: string;
-    profileId: string;
-    role: 'ADMIN' | 'MEMBER';
-    createdAt?: Date;
-    updatedAt?: Date;
-    
-}
+import { ReactNode } from "react";
 
 export type userType = {
     id: string;
@@ -26,7 +8,7 @@ export type userType = {
     email: string | null;
     password: string | null;
     image: string | null;
-    room: roomType;
+    room?: roomType;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -37,7 +19,38 @@ export type roomType = {
     imageUrl: string | null;
     inviteCode: string | null;
     admin: string | null;
-    user: userType;
+    user?: userType;
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface HomeCardProps {
+    className?: string;
+    img: string;
+    title: string;
+    description: string;
+    handleClick?: () => void;
+}
+  
+export interface MeetingCardProps {
+    title: string;
+    date: string;
+    icon: string;
+    isPreviousMeeting?: boolean;
+    buttonIcon1?: string;
+    buttonText?: string;
+    handleClick: () => void;
+    link: string;
+}
+
+export interface MeetingModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    title:string;
+    className?: string;
+    children?: ReactNode;
+    handleClick?: () => void;
+    buttonText?: string;
+    image?: string;
+    buttonIcon?: string;
+  }

@@ -1,26 +1,22 @@
 'use server'
 
-import { db } from "./db"; 
 import { auth } from "@/auth";
+import { db } from "./db";
 import { NextResponse } from "next/server";
-export const currentRoom = async () => {
-    const session = await auth();
-    const email = <string>session?.user?.email; 
+import { roomType } from "@/components/data-for-lists/data-list";
 
-    if(!session?.user) { 
-        return new NextResponse("Unauthorized", { status:400 });
-    };
+export const currentRoom = async(id: string): Promise<roomType | any> => {
 
-    const room = await db.room.findMany({
+    const session = await auth(); 
+
+    if(!session?.user) {
+        return NextResponse.json({message: "No user Found", status:403});
+    }
+
+    const room = await db.room.findUnique({
         where: {
-            user: {
-                some: {
-                    email
-                }
-            }
-        },
+            id: id as string
+        }, 
     });
-
-
-    return room as any;
+    return room as roomType | any;
 }

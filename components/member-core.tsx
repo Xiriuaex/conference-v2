@@ -12,16 +12,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { userType } from "@/components/data-for-lists/data-list";
+import { roomType, userType } from "@/components/data-for-lists/data-list";
 
 import Loader from './Loader'; 
 import { ShieldCheck, UserCog, UserMinus } from 'lucide-react';
+import { Button } from './ui/button';
+import { useParams } from 'next/navigation'; 
+import { currentRoom } from '@/lib/current-room';
+import { currentProfile } from '@/lib/current-profile';
+
+
 const MemberCore = () => { 
 
+  const {id} = useParams();
+  
   const [isLoading, setLoading] = useState(true);
   const [getMember, setGetMember] = useState<userType[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false); 
 
   useEffect(() => {
+ 
     const handleGetMember = async () => {
       try {
         await axios.get('/api/member')
@@ -31,26 +41,47 @@ const MemberCore = () => {
                     }
                   );
         
-        await axios.delete('api/member')
-                   .then((res) => {
-                      console.log("Member Removed Successfully!", res);
-                    });
-        
+       
       } catch (error) {
         console.log(error);
       }
     }
 
+    const handleAdmin = async()=> {
+      try {
+        const roomid: string= id as string; 
+        const room: roomType = await currentRoom(roomid); 
+        const user: userType= await currentProfile();
+
+        if(user.name === room.admin) {
+          setIsAdmin(!isAdmin);
+        }
+        
+      } catch (error) {
+        console.log(error);
+      }
+    }
     handleGetMember();
+    handleAdmin();
     
   }, []);
-
-  const handleRemove = (id) => {
-
+ 
+  const handleRemove = async (userId: string) => {
+    try { 
+      await axios.delete("/api/member", {data: {userId, id}}); 
+      window.location.reload();
+    } catch (error) {
+        console.log(error);
+    } 
   };
 
-  const handleMakeAdmin = (id) => {
-
+  const handleMakeAdmin = async(name: string|null) => {
+    try { 
+      await axios.put("/api/member", {data: {name, id}}); 
+      window.location.reload();
+    } catch (error) {
+        console.log(error);
+    } 
   };
 
   if (isLoading) return <Loader />
@@ -70,15 +101,22 @@ const MemberCore = () => {
                   <h1>{member.name}</h1>
                 </div>
                 <div className='flex-center'>
+                {isAdmin ?
                 <DropdownMenu>
                   <DropdownMenuTrigger className='focus:outline-none'><UserCog /></DropdownMenuTrigger>
                   <DropdownMenuContent className='bg-dark-1 text-white text-2xl'>
                     <DropdownMenuLabel>User Settings</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className='hover:bg-dark-4 gap-2' onClick={handleRemove(member?.id)}><UserMinus /> Kick User</DropdownMenuItem>
-                    <DropdownMenuItem className='hover:bg-dark-4 gap-2' onClick={handleMakeAdmin(member?.id)}><ShieldCheck />Admin</DropdownMenuItem>
+                    <div className='flex flex-col items-start justify-center'>
+                      <Button className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw]' onClick={()=>handleRemove(member.id)}><UserMinus /><h1>Kick</h1></Button>
+                      <Button className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw]' onClick={()=>handleMakeAdmin(member.name)}><ShieldCheck /><h1>Admin</h1></Button>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                :
+                 <></>
+                }
+                
 
                 </div>
               </div>

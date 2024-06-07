@@ -4,11 +4,12 @@ import MeetingTypeList from "@/components/meeting-type-list";
 import MemberCore from "@/components/member-core";
 import Sidebar from "@/components/sidebar";
 import useUser from "@/hooks/useUser";
+import { useParams } from "next/navigation";
  
 const personalHomePage = () => { 
   
-  const {user}= useUser();
- 
+  const {user} = useUser(); 
+  
   const now = new Date(); 
 
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });

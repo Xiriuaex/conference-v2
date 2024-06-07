@@ -1,27 +1,57 @@
 
-
-import { auth } from "@/auth";
 import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db"; 
-import { NextResponse } from "next/server";
+import { db } from "@/lib/db";  
+import { NextApiRequest } from "next";
+import { NextRequest, NextResponse } from "next/server";
  
 import { v4 as uuidv4 } from "uuid";
 
-interface typeRoom {
-    id?: string;
-    name?: string;
-    imageUrl?: string;
-    inviteCode?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-  }
+//Get all The Rooms:
+export async function GET(res: NextResponse) {
+    try {
+        const profile = await currentProfile();
+ 
+        if(!profile) {
+            return new NextResponse("Unauthorized", { status:400 });
+        } 
 
+        const room = await db.room.findMany({
+          where: {
+            user: {
+              some: {
+                id: profile.id,
+              }
+            }
+          },
+          select: { 
+            id: true,
+            name: true, 
+            inviteCode: true,
+            admin: true,
+            user: {  
+                select: {
+                    id: true
+                },
+                where: {
+                    id: profile?.id,
+                  },
+            },
+          }, 
+        });
+
+        return NextResponse.json(room);
+
+    } catch (error) {
+        console.log("[SERVERS_COULDN'T_GET]", error);
+        return new NextResponse("Internal Error", {status: 500});
+    }
+};
 
 //Create a Room:
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const { name, imageUrl } = await req.json();
-        const profile = await <typeRoom>currentProfile();
+        const profile = await currentProfile();
 
         if(!profile) {
             return new NextResponse("Unauthorized", { status:400 });
@@ -48,82 +78,91 @@ export async function POST(req: Request) {
         console.log("[SERVERS_POST]", error);
         return new NextResponse("Internal Error", {status: 500});
     }
-}
+};
 
-//Get all The Rooms:
-export async function GET(res: Response) {
-    try {
-        const profile = await <typeRoom>currentProfile();
- 
-        if(!profile) {
-            return new NextResponse("Unauthorized", { status:400 });
-        } 
-
-        const room = await db.room.findMany({
-          where: {
-            user: {
-              some: {
-                id: profile.id,
-              }
-            }
-          },
-          select: { 
-            id: true,
-            name: true, 
-            inviteCode: true,
-            user: {  
-                select: {
-                    id: true
-                },
+//Join/update room:
+export async function PUT(req: NextRequest, context: {update: string}) {
+    if(context.update === "join-room") {
+        try {
+            const { InviteCode } =  await req.json();
+            const profile = await currentProfile();
+     
+            if(!profile) {
+                return new NextResponse("Unauthorized", { status:400 });
+            } 
+    
+            
+            const roomJoined = await db.room.update({
                 where: {
-                    id: profile?.id,
-                  },
-            },
-          }, 
-        });
-
-        return NextResponse.json(room);
-
-    } catch (error) {
-        console.log("[SERVERS_COULDN'T_GET]", error);
-        return new NextResponse("Internal Error", {status: 500});
-    }
-}
-
-//Join a Room:
-export async function PUT(req: Request) {
-    try {
-        const { InviteCode } = await req.json();
-        const profile = await <typeRoom>currentProfile();
- 
-        if(!profile) {
-            return new NextResponse("Unauthorized", { status:400 });
-        } 
-
-        
-        const roomJoined = await db.room.update({
-            where: {
-                inviteCode: InviteCode
-            },
-            data: {
-                admin: '', 
-                user: {
-                    connectOrCreate: { 
-                        where: {
-                            id: profile.id,
-                        },
-                        create: {
-                            id: profile.id,
-                        },
+                    inviteCode: InviteCode
+                },
+                data: {
+                    user: {
+                        connectOrCreate: { 
+                            where: {
+                                id: profile.id,
+                            },
+                            create: {
+                                id: profile.id,
+                            },
+                        }
                     }
                 }
+            });
+    
+            return NextResponse.json(roomJoined);
+    
+        } catch (error) {
+            console.log("[SERVERS_COULDN'T_PUT]", error);
+            return new NextResponse("Internal Error", {status: 500});
+        }
+    }
+    else if(context.update === "update-details"){
+        try {
+            const { id, roomName } =  await req.json();
+            const profile = await currentProfile();
+     
+            if(!profile) {
+                return new NextResponse("Unauthorized", { status:400 });
+            } 
+
+            await db.room.update({
+                where: {
+                    id
+                },
+                data: {
+                    name: roomName,
+                }
+            });
+    
+            return NextResponse.json({message: "name update",status:400});
+    
+        } catch (error) {
+            console.log("[SERVERS_COULDN'T_PUT]", error);
+            return NextResponse.json({message:"Internal Error", status: 500});
+        }
+    }
+    
+};
+
+//Delete A room:
+export async function DELETE(req: NextRequest) {
+    try {
+        const {id} = await req.json();  
+        if(!id) {
+            return NextResponse.json({message: "ID not found!"}, {status: 404})
+        }  
+
+        await db.room.delete({
+            where: {
+                id
             }
         });
-
-        return NextResponse.json(roomJoined);
+            
+        return NextResponse.json({message: "room deleted successfully!", status: 400})
 
     } catch (error) {
-        console.log("[SERVERS_COULDN'T_PUT]", error);
+        console.log("[SERVERS_COULDN'T_DELETE]", error);
         return new NextResponse("Internal Error", {status: 500});
     }
 }

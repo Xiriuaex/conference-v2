@@ -1,5 +1,6 @@
 'use server'
 
+import { userType } from "@/components/data-for-lists/data-list";
 import { db } from "./db";
 
 import { auth } from "@/auth"; 
@@ -19,5 +20,5 @@ export const currentProfile = async () => {
         }
     });
     
-    return user as any;
+    return user as userType;
 }
