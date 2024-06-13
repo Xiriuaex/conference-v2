@@ -10,8 +10,13 @@ const useUser = () => {
     useEffect(() => {
         const getUser = async () => {
             try {
-                const user: userType = await currentProfile();
-                setUser(user);
+                const user: userType | undefined = await currentProfile();
+                if(!user) {
+                    return;
+                } else {
+                    setUser(user);
+                }
+               
             } catch (error) {
                 console.log("Can't get user.", error);
             }

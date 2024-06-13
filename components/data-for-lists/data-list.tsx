@@ -26,7 +26,7 @@ export type roomType = {
 
 export interface HomeCardProps {
     className?: string;
-    img: string;
+    img: string; 
     title: string;
     description: string;
     handleClick?: () => void;

@@ -15,40 +15,40 @@ import { hash } from "bcryptjs"
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
    
-const SignUpForm = async() => {
+const SignUpForm = () => {
     
-    const signUpHandler = async (formData: FormData) => {
-        "use server";
-        const session = await auth();  
+    const signUpHandler =  (formData: FormData) => {
+        // "use server";
+        // const session = await auth();  
         
-        const name = formData.get("username") as string | undefined;
-        const email = formData.get("email") as string | undefined;
-        const password = formData.get("password") as string | undefined;
+        // const name = formData.get("username") as string | undefined;
+        // const email = formData.get("email") as string | undefined;
+        // const password = formData.get("password") as string | undefined;
 
-        if(!name || !password || !email) {
-            throw new Error("Please provide all field!")
-        };
+        // if(!name || !password || !email) {
+        //     throw new Error("Please provide all field!")
+        // };
 
-        const user = await db.user.findUnique({ 
-            where: {
-                email
-            }
-         });
+        // const user = await db.user.findUnique({ 
+        //     where: {
+        //         email
+        //     }
+        //  });
 
-        if(user) throw new Error("User already exists!");
+        // if(user) throw new Error("User already exists!");
 
-        const hashedPassword = await hash(password, 10);
+        // const hashedPassword = await hash(password, 10);
 
-        await db.user.create({
-            data: {
-                username: name,
-                name,
-                email,
-                password: hashedPassword,  
-            }
-        }); 
+        // await db.user.create({
+        //     data: {
+        //         username: name,
+        //         name,
+        //         email,
+        //         password: hashedPassword,  
+        //     }
+        // }); 
 
-        redirect("/login");
+        // redirect("/login");
 
     };
 
@@ -60,7 +60,7 @@ const SignUpForm = async() => {
                 <CardDescription>Create Your Account</CardDescription>
             </CardHeader>
             <CardContent className="text-dark-3">
-                <form action={signUpHandler}  className="flex flex-col space-y-3">
+                <form    className="flex flex-col space-y-3">
                     <Input type="email" placeholder="Email" name="email"/>
                     <Input type="text" placeholder="Username" name="username"/>
                     <Input type="password" placeholder="Password" name="password"/>

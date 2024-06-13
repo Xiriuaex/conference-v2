@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
-//@ts-nocheck
+
 'use client'
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import HomeCard from "./home-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MeetingModal from "./meeting-modal";
 import { Call, StreamVideo, StreamVideoClient } from "@stream-io/video-react-sdk";
 import { useToast } from "./ui/use-toast";
@@ -13,6 +13,11 @@ import DatePicker from "react-datepicker";
 import useGetClient from "@/hooks/useGetClient";
 import useUser from "@/hooks/useUser";
 import Loader from "./Loader";
+import { Input } from "./ui/input";
+import Meeting from "@/app/(root)/(main)/room/[id]/meeting/[meetid]/page";
+import MemberCore from "./member-core";
+import { roomType } from "./data-for-lists/data-list";
+import { currentRoom } from "@/lib/current-room";
 
 //intial values of a call:
 const initialValues = {
@@ -22,22 +27,43 @@ const initialValues = {
 };
 
 const MeetingTypeList = () => {
+    const {user} = useUser();  
+    const now = new Date(); 
+    const {id} = useParams();
+    const rid: string= id as string;
+    const [room, setRoom]= useState<roomType>();
+
+    useEffect(()=> {
+        const getRoom = async () => {
+            const room = await currentRoom(rid);
+            setRoom(room);
+        } 
+        getRoom();
+       
+    }, []);
+   
+  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const date = (new Intl.DateTimeFormat('en-US', { dateStyle: 'full' })).format(now);
+
     //toast and useRouter:
     const { toast } = useToast();
     const router = useRouter();
 
-    const {videoClient} = useGetClient();
-    const {user} = useUser();
+    const {videoClient} = useGetClient();  
 
     const [meetingState, setMeetingState] = useState<'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined>(undefined);
-
-
+    const [callPage, setCallPage] = useState(false);
+ 
+    
     const [values, setValues] = useState(initialValues);
     const [callDetails, setCallDetails] = useState<Call>();
     
     //creates meeting call:
     const createMeeting= async () => {
-        if(!videoClient || !user ) return;
+        if(!videoClient) {
+            console.log("no video client");
+        };
+        if(!user) return;
 
         try {
             if (!values.dateTime) {
@@ -62,15 +88,16 @@ const MeetingTypeList = () => {
                 },
                 },
             });
+            
             setCallDetails(call);
             if (!values.description) {
-                router.push(`/meeting/${call.id}`);
+                setCallPage(!callPage);
+                toast({
+                    title: 'Meeting Created',
+                });
             }
-            toast({
-                title: 'Meeting Created',
-            });
         } catch (error) {
-            console.log(error);
+            console.log("this is error",error);
             toast({
                 title: "Failed to create Meeting!",
               })
@@ -79,10 +106,42 @@ const MeetingTypeList = () => {
 
     if (!videoClient || !user) return <Loader />;
 
-    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/room/[roomId]/meeting/${callDetails?.id}`;
+    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
+    console.log(meetingLink);
+return ( 
+<>
+    {callPage ?
+            callDetails ? (
+                <Meeting callid={callDetails.id}  onleave={callPage} setOnLeave={setCallPage}/>
+            ) : 
+            ( 
+                <Loader />
+            )
+        :
+        <>
+        <div className="grid grid-cols-2  h-[303px] w-full rounded-[20px] bg-hero bg-cover">
+        <div className="flex h-full flex-col justify-between max-md:px-5 max-md:py-8 lg:p-11 space-y-3">
+          <h2 className="glassmorphism max-w-[273px] rounded py-2 text-center text-base font-normal">
+            {room?.name}
+          </h2> 
+          <h2 className="glassmorphism max-w-[273px] rounded py-2 text-center text-base font-normal">
+            Welcome {user?.name}
+          </h2>
+          <h2 className="glassmorphism max-w-[500px] rounded py-2 text-center text-base font-normal ">
+            Room Invite Code: <span className="text-green-300">{room?.inviteCode}</span>
+          </h2>
+          <div className="flex flex-col gap-2">
+            <h1 className="text-4xl font-extrabold lg:text-7xl">{time}</h1>
+            <p className="text-lg font-medium text-sky-1 lg:text-2xl">{date}</p>
+          </div>
+        </div>
 
-  return ( 
-    <section className="grid grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
+        <div className="bg-dark-3 pt-4 rounded-[14px] overflow-auto">
+          <MemberCore />
+        </div>
+      </div>
+
+    <section className="grid grid-rows-1 md:grid-cols-2 xl:grid-cols-4 gap-5 p-5 mt-16">
         <HomeCard
             img="..//icons/add-meeting.svg"
             title="New Meeting"
@@ -96,7 +155,7 @@ const MeetingTypeList = () => {
             className="bg-blue-1"
             handleClick={() => setMeetingState('isJoiningMeeting')}
         />
-        <HomeCard 
+        {/* <HomeCard 
             img="..//icons/schedule.svg"
             title="Schedule Meeting"
             description="Plan your meeting"
@@ -109,7 +168,7 @@ const MeetingTypeList = () => {
             description="Meeting Recordings"
             className="bg-yellow-1"
             handleClick={() => router.push('/recordings')}
-        />
+        /> */}
 
         {!callDetails ? ( 
             <MeetingModal
@@ -146,7 +205,7 @@ const MeetingTypeList = () => {
                 </div>
             </MeetingModal>
         ) :         
-          (  <MeetingModal
+        (  <MeetingModal
                 isOpen={meetingState === 'isScheduleMeeting'}
                 onClose={()=> setMeetingState(undefined)}
                 title={"Meeting Created"}
@@ -168,7 +227,26 @@ const MeetingTypeList = () => {
             buttonText="Start Meeting"
             handleClick={createMeeting} 
         />
+
+        <MeetingModal
+            isOpen={meetingState === 'isJoiningMeeting'}
+            onClose={() => setMeetingState(undefined)}
+            title="Type the link here"
+            className="text-center"
+            buttonText="Join Meeting"
+            handleClick={() => router.push(values.link)}
+        >
+            <Input
+            placeholder="Meeting link"
+            onChange={(e) => setValues({ ...values, link: e.target.value })}
+            className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+        </MeetingModal>
+
     </section>
+    </>
+    }
+</>
   )
 }
 

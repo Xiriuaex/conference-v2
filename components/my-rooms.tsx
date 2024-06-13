@@ -10,7 +10,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 
 import { roomType, userType } from "@/components/data-for-lists/data-list"
 import Loader from './Loader'
@@ -18,10 +27,12 @@ import { Button } from './ui/button';
 import { currentProfile } from '@/lib/current-profile'; 
 import useUser from '@/hooks/useUser';
 import { Pencil, Search, Settings, Trash2 } from 'lucide-react';
+import { currentRoom } from '@/lib/current-room';
+import UpdateRoomDialog from './forms/update-room-form';
+import UpdateRoomForm from './forms/update-room-form';
 
 const MyRooms = () => { 
 
-  
   const {user} = useUser();
   const [isLoading, setLoading] = useState(true);
   const [getRoom, setGetRoom] = useState<roomType[]>([]);
@@ -48,12 +59,37 @@ const MyRooms = () => {
     
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async(id: string) => {
+    try {
+      const roomId: string= id as string; 
+      const room: roomType = await currentRoom(roomId);
+      
+      if(user?.name !== room.admin) {
+        return;
+      }
+      
+      await axios.delete("/api/room", {data: {id}}); 
+      window.location.reload();
 
+    } catch (error) {
+      console.log(error);
+    }
   };
+ 
+  const handleEdit = async (id: string) => {
+    try {
+      const roomId: string= id as string; 
+      const room: roomType = await currentRoom(roomId);
+      
+      if(user?.name !== room.admin) {
+        return;
+      }  
+      await axios.put("/api/room?update-details", {data: {id}}); 
+      window.location.reload();
 
-  const handleEdit = (id: string) => {
-
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 
@@ -80,39 +116,64 @@ const MyRooms = () => {
         { isLoading ? <Loader /> :
           (getRoom.length !== 0) ?
           getRoom.map((getRoom: roomType) => (
-            <Button className='bg-dark-1 grid grid-cols-[1fr_2fr_1fr] p-2 m-2 rounded-xl hover:bg-dark-4' onClick={() => handleRouteToRoom(getRoom.id)}>
+            <div className='grid lg:grid-cols-[1fr_.1fr] grid-cols-[.8fr_.1fr]'>
+            <Button className='bg-dark-1 grid grid-cols-[1fr_2fr_1fr] p-2 m-2 rounded-xl hover:bg-gray-500 min-w-[70%]' onClick={() => handleRouteToRoom(getRoom.id)}>
                 <div className='flex justify-start px-2'>
                   <h1>{getRoom?.name}</h1>
                 </div>
-                <div className='flex justify-start'>
+                <div className='lg:flex justify-start hidden'>
                   <h1>{getRoom?.inviteCode}</h1>
                 </div>
-                <div className='flex justify-center'> 
+                <div className='flex justify-center pl-9 gap-2'> 
                   {(getRoom.admin === user?.name) ? (
                     <h1>Admin</h1>
                   ):
                     <h1>Member</h1>
                   }
-                 
-                </div>
-                <div>
-                {(getRoom.admin === user?.name) ?
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className='focus:outline-none'><Settings /></DropdownMenuTrigger>
-                    <DropdownMenuContent className='bg-dark-1 text-white text-2xl'>
-                      <DropdownMenuLabel>Room Settings</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <div className='flex flex-col items-start justify-center'>
-                        <Button className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw]' onClick={()=>handleDelete(getRoom.id)}><Trash2 /><h1>Delete</h1></Button>
-                        <Button className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw]' onClick={()=>handleEdit(getRoom.id)}><Pencil /><h1>Edit</h1></Button>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  :
-                  <></>
-                }
                 </div>
             </Button>
+            <div className='flex flex-center'>
+            {(getRoom.admin === user?.name) ?
+              <DropdownMenu>
+                <DropdownMenuTrigger className='focus:outline-none hover:text-blue-400'><Settings /></DropdownMenuTrigger>
+                <DropdownMenuContent className='bg-dark-1 text-white text-2xl'>
+                  <DropdownMenuLabel>Room Settings</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className='flex flex-col items-start justify-center'>
+                    <Dialog>
+                      <DialogTrigger className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw] rounded-md'>
+                        <Button className='gap-2 text-[1.1rem]'><Trash2 /><p>Delete</p></Button>
+                      </DialogTrigger>
+                      <DialogContent className='text-white bg-transparent border-lg rounded-lg'>
+                          <DialogHeader>
+                          <DialogTitle>Are you absolutely sure?</DialogTitle>
+                          <DialogDescription>
+                            <Button className='mt-4 items-center font-semibold border-[2px] bg-red-600 hover:bg-red-700' onClick={()=>handleDelete(getRoom.id)}>Yes, Delete this room</Button>
+                          </DialogDescription>
+                          </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                      <DialogTrigger className='hover:bg-dark-4 grid grid-cols-[.3fr_1fr] w-[20vw] rounded-md'>
+                        <Button className='gap-2 text-[1.1rem]'><Pencil /><p>Edit</p></Button>
+                      </DialogTrigger>
+                      <DialogContent className='text-white'>
+                          <DialogHeader>
+                          <DialogTitle></DialogTitle>
+                          <DialogDescription>
+                            <UpdateRoomForm id={`${getRoom.id}`} />
+                          </DialogDescription>
+                          </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              :
+              <></>
+            }                
+          </div>
+          </div>
           )) : 
           <div>You are not a member of any room</div>
         }

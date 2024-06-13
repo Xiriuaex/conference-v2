@@ -2,15 +2,17 @@
 
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 
-import { Button } from './ui/button';
-import { useRouter } from 'next/navigation';
-import useGetRoom from '@/hooks/useGetRoom';
+import { Button } from './ui/button';  
+import { toast } from './ui/use-toast';
 
-const EndCallButton = () => {
-  const call = useCall();
-  const router = useRouter();
-  const {room} = useGetRoom(); 
-   
+export interface MeetingProps { 
+  onleave: boolean, 
+  setOnLeave: (onleave: boolean) => void;
+}
+
+const EndCallButton = ({ onleave, setOnLeave}: MeetingProps) => {
+  const call = useCall(); 
+
   if (!call)
     throw new Error(
       'useStreamCall must be used within a StreamCall component.',
@@ -26,9 +28,10 @@ const EndCallButton = () => {
 
   if (!isMeetingOwner) return null;
 
-  const endCall = async () => {
-    await call.endCall();
-    router.push(`/room/${room?.id}`);
+  const endCall = async () => { 
+    await call.endCall(); 
+    setOnLeave(!onleave);
+    toast({ title: 'Meeting Ended'})
   };
 
   return (

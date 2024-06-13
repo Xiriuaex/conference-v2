@@ -14,8 +14,7 @@ import {
 import Link from "next/link"
 
 const Page = () => {
-
-    console.log("what the fuck 3")
+ 
   return (
     <div className="flex-center h-dvh text-white">
         <Card>

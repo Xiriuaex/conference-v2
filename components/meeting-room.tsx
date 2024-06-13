@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -10,8 +10,7 @@ import {
   SpeakerLayout,
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+ 
 import { Users, LayoutList } from 'lucide-react';
 
 import {
@@ -24,21 +23,20 @@ import {
 
 import Loader from './Loader';
 import EndCallButton from './end-call-button';
-import { cn } from '@/lib/utils';
-import useGetRoom from '@/hooks/useGetRoom';
+import { cn } from '@/lib/utils'; 
+import { useRouter } from 'next/navigation';
+import { useRoomContext } from '@/providers/current-room-provider';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
-const MeetingRoom = () => {
-  
-  const searchParams = useSearchParams();
+export interface MeetingProps { 
+  onleave: boolean, 
+  setOnLeave: (onleave: boolean) => void;
+}
 
-  // const isPersonalRoom = !!searchParams.get('personal');
-  //'personal' => !'personal' => false => !false => true
-  //undefined => !undefined => true => !true => false
+const MeetingRoom = ({ onleave, setOnLeave}: MeetingProps) => {
 
-  const router = useRouter();
-  const {room} = useGetRoom();
+  const router = useRouter();  
 
   const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
 
@@ -61,8 +59,7 @@ const MeetingRoom = () => {
   };
     
   return (
-    <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
-
+    <section className="relative h-screen w-full overflow-hidden pt-4 text-white"> 
       {/* call layout and view participants: */}
       <div className="relative flex size-full items-center justify-center">
         <div className=" flex size-full max-w-[1000px] items-center">
@@ -80,7 +77,7 @@ const MeetingRoom = () => {
       {/* video layout and call controls */}
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 flex-wrap">
 
-        <CallControls onLeave={() => router.push(`/room/${room?.id}`)} />
+        <CallControls />
 
         {/* Dropdown for Layout Options */}
         <DropdownMenu>
@@ -113,7 +110,7 @@ const MeetingRoom = () => {
           </div>
         </button>
         
-        <EndCallButton />
+        <EndCallButton onleave={onleave} setOnLeave={setOnLeave}/>
         {/* {!isPersonalRoom && <EndCallButton />} for personal room */}
       </div>
     </section>

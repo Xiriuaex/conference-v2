@@ -42,7 +42,7 @@ const JoinRoomForm = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            await axios.put('/api/room', values); 
+            await axios.put('/api/room?update=join-room', values); 
 
             form.reset();
             router.refresh();

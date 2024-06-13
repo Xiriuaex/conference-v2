@@ -25,6 +25,7 @@ model User {
 model Room {
   id         String  @id @default(uuid())
   name       String? @unique
+  description String?
   imageUrl   String? @db.Text
   inviteCode String? @unique
   

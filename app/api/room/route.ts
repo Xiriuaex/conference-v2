@@ -1,7 +1,6 @@
 
-import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db";  
-import { NextApiRequest } from "next";
+import { currentProfile } from "@/lib/current-profile"; 
+import { db } from "@/lib/db";   
 import { NextRequest, NextResponse } from "next/server";
  
 import { v4 as uuidv4 } from "uuid";
@@ -81,16 +80,19 @@ export async function POST(req: NextRequest) {
 };
 
 //Join/update room:
-export async function PUT(req: NextRequest, context: {update: string}) {
-    if(context.update === "join-room") {
-        try {
-            const { InviteCode } =  await req.json();
-            const profile = await currentProfile();
-     
-            if(!profile) {
-                return new NextResponse("Unauthorized", { status:400 });
-            } 
+export async function PUT(req: NextRequest, res:NextResponse) {
+
+    const {searchParams} = new URL(req.url);
+    const updateType = searchParams.get('update');
     
+    if (updateType === "join-room") {
+        try {
+            const { InviteCode } = await req.json();
+            const profile = await currentProfile();
+
+              if (!profile) {
+                return new NextResponse("Unauthorized", { status: 400 });
+            }
             
             const roomJoined = await db.room.update({
                 where: {
@@ -98,7 +100,7 @@ export async function PUT(req: NextRequest, context: {update: string}) {
                 },
                 data: {
                     user: {
-                        connectOrCreate: { 
+                        connectOrCreate: {
                             where: {
                                 id: profile.id,
                             },
@@ -114,35 +116,40 @@ export async function PUT(req: NextRequest, context: {update: string}) {
     
         } catch (error) {
             console.log("[SERVERS_COULDN'T_PUT]", error);
-            return new NextResponse("Internal Error", {status: 500});
+            return new NextResponse("Internal Error", { status: 500 });
         }
-    }
-    else if(context.update === "update-details"){
+        
+    } else if (updateType === "update-details") {
+        
         try {
-            const { id, roomName } =  await req.json();
+            const { id, Name, Description } = await req.json();
+            
             const profile = await currentProfile();
-     
-            if(!profile) {
-                return new NextResponse("Unauthorized", { status:400 });
-            } 
+            
+            if (!profile) {
+                console.log("Err")
+                return new NextResponse("Unauthorized", { status: 400 });
+            }
 
             await db.room.update({
                 where: {
                     id
                 },
                 data: {
-                    name: roomName,
+                    name: Name,
+                    imageUrl: Description,
                 }
             });
     
-            return NextResponse.json({message: "name update",status:400});
-    
-        } catch (error) {
+            return NextResponse.json({ message: "Room details updated", status: 200 });
+
+         } catch (error) {
             console.log("[SERVERS_COULDN'T_PUT]", error);
-            return NextResponse.json({message:"Internal Error", status: 500});
+            return NextResponse.json({ message: "Internal Error", status: 500 });
         }
+    } else {
+        return new NextResponse("Invalid update type", { status: 400 });
     }
-    
 };
 
 //Delete A room:
@@ -166,3 +173,4 @@ export async function DELETE(req: NextRequest) {
         return new NextResponse("Internal Error", {status: 500});
     }
 }
+

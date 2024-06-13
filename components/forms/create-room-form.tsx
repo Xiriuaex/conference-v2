@@ -87,13 +87,13 @@ const CreateRoomForm = () => {
                         render= {({ field }) => (
                             <FormItem>
                                 <FormLabel className="uppercase text-xs font-bold text-white dark:text-secondary/70 w-fit">
-                                    Image URL
+                                    Room Description
                                 </FormLabel>
                                 <FormControl>
                                     <Input 
                                         disabled={isLoading}
                                         className="bg-zinc-500/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                                        placeholder="Enter server details"
+                                        placeholder="Enter Room Description"
                                         {...field}
                                     />
                                 </FormControl>

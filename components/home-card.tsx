@@ -9,7 +9,7 @@ import { HomeCardProps } from './data-for-lists/data-list';
 const HomeCard = ({ 
     className, 
     img, 
-    title, 
+    title,  
     description, 
     handleClick }: HomeCardProps) => {
         return (
@@ -25,7 +25,7 @@ const HomeCard = ({
               </div>
               
               <div className="flex flex-col gap-2">
-                <h1 className="text-2xl font-bold">{title}</h1>
+                <h1 className="text-2xl font-bold">{title}</h1> 
               </div>
             </section>
           );
