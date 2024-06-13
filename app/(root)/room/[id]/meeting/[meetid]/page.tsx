@@ -15,12 +15,13 @@ import { StreamCall, StreamTheme } from "@stream-io/video-react-sdk";
 import { currentRoom } from "@/lib/current-room";
 
 export interface MeetingProps {
+  link: string,
   callid: string,
   onleave: boolean, 
   setOnLeave: (onleave: boolean) => void;
 }
  
-const Meeting = ({callid, onleave, setOnLeave}: MeetingProps) => {
+const Meeting = ({link, callid, onleave, setOnLeave}: MeetingProps) => {
  
   const { user } = useUser();
   const { call, isCallLoading } = useGetCallById(callid);
@@ -47,7 +48,7 @@ const Meeting = ({callid, onleave, setOnLeave}: MeetingProps) => {
                 {!isSetupComplete ? (
                     <MeetingSetup setIsSetupComplete={setIsSetupComplete}/>
                 ):
-                    <MeetingRoom  setOnLeave={setOnLeave} onleave={onleave}/>
+                    <MeetingRoom link={link} setOnLeave={setOnLeave} onleave={onleave}/>
                 }
             </StreamTheme>
         </StreamCall>

@@ -1,8 +1,7 @@
 
-
-import { roomType, userType } from "@/components/data-for-lists/data-list";
+ 
 import { currentProfile } from "@/lib/current-profile";
-import { currentRooms } from "@/lib/current-user-room";
+import { currentRoom } from "@/lib/current-room"; 
 import { db } from "@/lib/db"; 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,8 +9,18 @@ import { NextRequest, NextResponse } from "next/server";
 //Get all The members:
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
-        const user: userType = await currentProfile();
-        const room: roomType = await currentRooms();
+        const url = new URL(req.url);
+        const id: string = url.searchParams.get('id') as string;
+ 
+        const user = await currentProfile();
+        if (!user) {
+            return new NextResponse("Unauthorized", { status: 400 });
+        }
+
+        const room = await currentRoom(id);
+        if (!room) {
+            return new NextResponse("Room not found", { status: 404 });
+        }
         if(!user) {
             return new NextResponse("Unauthorized", { status:400 });
         }  
@@ -97,7 +106,7 @@ export async function PUT(req: NextRequest) {
         if(!name) {
             return NextResponse.json({message: "Name not found!"}, {status: 404})
         } 
-        console.log(name);
+        console.log("name",name);
   
         await db.room.update({ 
             where: {

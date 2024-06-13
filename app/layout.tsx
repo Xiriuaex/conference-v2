@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 import 'react-datepicker/dist/react-datepicker.css'
+import Navbar from "@/components/navbar";
 
 export default function RootLayout({
   children,
@@ -26,8 +27,9 @@ export default function RootLayout({
   return (
       <html lang="en">
         <body className={`${inter.className} bg-dark-2`}>
-            {children}
-            <Toaster />
+          <Navbar />
+          {children}
+          <Toaster />
         </body>
       </html>
   );

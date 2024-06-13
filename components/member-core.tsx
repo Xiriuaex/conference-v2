@@ -34,14 +34,13 @@ const MemberCore = () => {
  
     const handleGetMember = async () => {
       try {
-        await axios.get('/api/member')
+        const params = { id }; 
+        await axios.get('/api/member', {params})
                     .then((res) => {
                       setGetMember(res.data)
                       setLoading(false)
                     }
-                  );
-        
-       
+                  );  
       } catch (error) {
         console.log(error);
       }
@@ -51,9 +50,9 @@ const MemberCore = () => {
       try {
         const roomid: string= id as string; 
         const room: roomType = await currentRoom(roomid); 
-        const user: userType= await currentProfile();
-
-        if(user.name === room.admin) {
+        const user = await currentProfile(); 
+        
+        if(user?.name === room.admin) {
           setIsAdmin(!isAdmin);
         }
         
@@ -63,6 +62,7 @@ const MemberCore = () => {
     }
     handleGetMember();
     handleAdmin();
+    console.log()
     
   }, []);
  
@@ -76,8 +76,13 @@ const MemberCore = () => {
   };
 
   const handleMakeAdmin = async(name: string|null) => {
+    console.log(name);
+    const values = {
+      name,
+      id
+    }
     try { 
-      await axios.put("/api/member", {data: {name, id}}); 
+      await axios.put("/api/member", values);  
       window.location.reload();
     } catch (error) {
         console.log(error);

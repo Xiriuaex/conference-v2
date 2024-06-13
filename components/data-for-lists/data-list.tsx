@@ -16,7 +16,7 @@ export type userType = {
 export type roomType = {
     id: string;
     name: string | null;
-    imageUrl: string | null;
+    description: string | null;
     inviteCode: string | null;
     admin: string | null;
     user?: userType;

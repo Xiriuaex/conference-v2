@@ -11,7 +11,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const personalHomePage = () => { 
-
+  
+  
   return (
     <section className="gap-5 text-white">
       

@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+//@ts-nocheck
 
 'use client'
 
@@ -14,10 +15,13 @@ import useGetClient from "@/hooks/useGetClient";
 import useUser from "@/hooks/useUser";
 import Loader from "./Loader";
 import { Input } from "./ui/input";
-import Meeting from "@/app/(root)/(main)/room/[id]/meeting/[meetid]/page";
+
 import MemberCore from "./member-core";
 import { roomType } from "./data-for-lists/data-list";
 import { currentRoom } from "@/lib/current-room";
+import Meeting from "@/app/(root)/room/[id]/meeting/[meetid]/page";
+import { currentProfile } from "@/lib/current-profile";
+import Denied from "@/app/Denied/page";
 
 //intial values of a call:
 const initialValues = {
@@ -31,12 +35,12 @@ const MeetingTypeList = () => {
     const now = new Date(); 
     const {id} = useParams();
     const rid: string= id as string;
-    const [room, setRoom]= useState<roomType>();
-
+    const [room, setRoom]= useState<roomType>(); 
     useEffect(()=> {
         const getRoom = async () => {
             const room = await currentRoom(rid);
             setRoom(room);
+            console.log("d",user?.room?.id)
         } 
         getRoom();
        
@@ -104,15 +108,22 @@ const MeetingTypeList = () => {
         }
     }; 
 
+    const [isInRoom, setIsInRoom] = useState(false); 
+    
+
     if (!videoClient || !user) return <Loader />;
 
-    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
+    const meetingLink = `home/meeting/${callDetails?.id}`;
     console.log(meetingLink);
 return ( 
 <>
     {callPage ?
             callDetails ? (
-                <Meeting callid={callDetails.id}  onleave={callPage} setOnLeave={setCallPage}/>
+                (isInRoom ?
+                <Meeting link={meetingLink} callid={callDetails.id}  onleave={callPage} setOnLeave={setCallPage}/>
+                :
+                <Denied/>
+            )
             ) : 
             ( 
                 <Loader />
@@ -122,7 +133,7 @@ return (
         <div className="grid grid-cols-2  h-[303px] w-full rounded-[20px] bg-hero bg-cover">
         <div className="flex h-full flex-col justify-between max-md:px-5 max-md:py-8 lg:p-11 space-y-3">
           <h2 className="glassmorphism max-w-[273px] rounded py-2 text-center text-base font-normal">
-            {room?.name}
+            Room name: {room?.name}
           </h2> 
           <h2 className="glassmorphism max-w-[273px] rounded py-2 text-center text-base font-normal">
             Welcome {user?.name}
@@ -154,22 +165,8 @@ return (
             description="via invitation link"
             className="bg-blue-1"
             handleClick={() => setMeetingState('isJoiningMeeting')}
-        />
-        {/* <HomeCard 
-            img="..//icons/schedule.svg"
-            title="Schedule Meeting"
-            description="Plan your meeting"
-            className="bg-purple-1"
-            handleClick={() => setMeetingState('isScheduleMeeting')}
-        />
-        <HomeCard
-            img="..//icons/recordings.svg"
-            title="View Recordings"
-            description="Meeting Recordings"
-            className="bg-yellow-1"
-            handleClick={() => router.push('/recordings')}
-        /> */}
-
+        /> 
+        
         {!callDetails ? ( 
             <MeetingModal
                 isOpen={meetingState === 'isScheduleMeeting'}

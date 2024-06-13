@@ -62,7 +62,7 @@ const UpdateRoomForm = ({id}: {id: string}) => {
         if (room) {
           form.reset({
             Name: room.name?.toString(),
-            Description: room.imageUrl?.toString()
+            Description: room.description?.toString()
           });
         }
       }, [room, form]);

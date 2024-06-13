@@ -1,10 +1,11 @@
 'use client'
 import Image from "next/image"
-import Link from "next/link"
-import useUser from "@/hooks/useUser";
+import Link from "next/link" 
 import { useEffect, useState } from "react";
 import { userType } from "./data-for-lists/data-list";
 import { currentProfile } from "@/lib/current-profile";
+import { Button } from "./ui/button";
+import { signOut } from "next-auth/react"
 
 const Navbar = () => { 
 
@@ -38,14 +39,14 @@ const Navbar = () => {
     </Link> 
     {user ?
       <div className="flex flex-row justify-center space-x-4">
-        <div className="text-white font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
+        <div className="text-white hover:text-sky-300 transition ease-in-out">
           <Link  href={`/`}>
-            Logout 
+            <Button className="text-2xl font-semibold" onClick={() => signOut()}>Signout</Button>
           </Link>  
         </div>
-        <div className="text-white font-semibold text-2xl hover:text-sky-300 transition ease-in-out">
+        <div className="text-white hover:text-sky-300 transition ease-in-out">
           <Link  href={`/user/${user.id}`}>
-            Home 
+            <Button className="text-2xl font-semibold">Home</Button>
           </Link>  
         </div>
       </div> :

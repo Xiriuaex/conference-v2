@@ -28,7 +28,7 @@ const CreateRoomForm = () => {
         name: z.string().min(1, {
             message: "Room name is required!"
         }),
-        imageUrl: z.string().min(1, {
+        description: z.string().min(1, {
             message: "Room details is required!"
         })
     });
@@ -38,7 +38,7 @@ const CreateRoomForm = () => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            imageUrl: "",
+            description: "",
         }
     });
 
@@ -83,7 +83,7 @@ const CreateRoomForm = () => {
                     )}/>
                     <FormField 
                         control={form.control}
-                        name="imageUrl"
+                        name="description"
                         render= {({ field }) => (
                             <FormItem>
                                 <FormLabel className="uppercase text-xs font-bold text-white dark:text-secondary/70 w-fit">

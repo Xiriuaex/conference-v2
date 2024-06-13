@@ -146,7 +146,7 @@ const MyRooms = () => {
                       </DialogTrigger>
                       <DialogContent className='text-white bg-transparent border-lg rounded-lg'>
                           <DialogHeader>
-                          <DialogTitle>Are you absolutely sure?</DialogTitle>
+                          <DialogTitle>Are you sure?</DialogTitle>
                           <DialogDescription>
                             <Button className='mt-4 items-center font-semibold border-[2px] bg-red-600 hover:bg-red-700' onClick={()=>handleDelete(getRoom.id)}>Yes, Delete this room</Button>
                           </DialogDescription>

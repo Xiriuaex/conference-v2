@@ -49,7 +49,7 @@ export async function GET(res: NextResponse) {
 //Create a Room:
 export async function POST(req: NextRequest) {
     try {
-        const { name, imageUrl } = await req.json();
+        const { name, description } = await req.json();
         const profile = await currentProfile();
 
         if(!profile) {
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         const room = await db.room.create({
             data: {
                 name,
-                imageUrl,
+                description,
                 inviteCode: uuidv4(),
                 admin: profile.name, 
                 user: {
@@ -137,7 +137,7 @@ export async function PUT(req: NextRequest, res:NextResponse) {
                 },
                 data: {
                     name: Name,
-                    imageUrl: Description,
+                    description: Description,
                 }
             });
     
